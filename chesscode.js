@@ -1,14 +1,14 @@
 /* WHAT I NEED TO DO:
- * timer
- * highlight previous move
- * show captured pieces on the side
- * have it say white / black to move
- * add touchscreen as well - ontouchstart, ontouchend, ontouchmove, ontouch [0] x, ontouch [0] y
- * show potential moves with purple dots
+ * 
+ * Configure it to computer moves / human moves (no flip screen)
+ * Random moves
+ * Weight assignments for each piece in each square
+ * 
+ * 
  *
- * NO:
- * dead position (very difficult)
- * ai
+ * 
+ * 
+ * 
  */
 
 class Chess
@@ -796,8 +796,8 @@ function drawBoard(a)
     xPosit = parseInt(xPosit) - 1;
     yPosit = parseInt(yPosit) - 1;
     
-    if (Chess.turn == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
-    if (Chess.pause == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
+    //if (Chess.turn == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
+    //if (Chess.pause == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
     
     xPosit *= 60;
     yPosit *= 60;
@@ -817,8 +817,8 @@ function drawBoard(a)
     xPosit = parseInt(xPosit) - 1;
     yPosit = parseInt(yPosit) - 1;
     
-    if (Chess.turn == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
-    if (Chess.pause == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
+    //if (Chess.turn == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
+    //if (Chess.pause == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
     
     xPosit *= 60;
     yPosit *= 60;
@@ -857,8 +857,8 @@ function drawBoard(a)
     xPosit = a[i].x - 1;
     yPosit = a[i].y - 1;
     
-    if (Chess.turn == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
-    if (Chess.pause == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
+    //if (Chess.turn == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
+    //if (Chess.pause == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
     
     xPosit *= 60;
     yPosit *= 60;
