@@ -751,8 +751,9 @@ function tryToMove(i, a)
         if(a[i].canMoveTo(x, y, a) && a[i].color == Chess.turn)  // maybe add "&& Chess.turn == (human color whatever)"
         {
           
+
           a[i].realMoveTo(x, y, a);
-          
+
           let counter = 1;
           while (counter == 1 && a[i].type == 1 && ((a[i].y == 8 && a[i].color == 1) || (a[i].y == 1 && a[i].color == 2)))
           {
@@ -762,42 +763,13 @@ function tryToMove(i, a)
             if (prom == "rook") {counter = 0; a[i].promotePawn(4);}
             if (prom == "queen") {counter = 0; a[i].promotePawn(5);}
           }
-          
-          Chess.movesList[Chess.movesList.length] = [];
-          
-          let c = 0;
-          
-          for (let t = 0; t < a.length; t += 1)
-          {
-            Chess.movesList[Chess.movesList.length-1][c] = a[t].x;
-            Chess.movesList[Chess.movesList.length-1][c+1] = a[t].y;
-            Chess.movesList[Chess.movesList.length-1][c+2] = a[t].type;
-            Chess.movesList[Chess.movesList.length-1][c+3] = a[t].isAlive;
-            Chess.movesList[Chess.movesList.length-1][c+4] = a[t].passant;
-            c += 5;
-          }
-          
-          Chess.movesList[Chess.movesList.length-1][c] = Chess.blackCastleRight;
-          Chess.movesList[Chess.movesList.length-1][c+1] = Chess.blackCastleLeft;
-          Chess.movesList[Chess.movesList.length-1][c+2] = Chess.whiteCastleRight;
-          Chess.movesList[Chess.movesList.length-1][c+3] = Chess.whiteCastleLeft;
-          
-          Chess.movesList[Chess.movesList.length] = 1;
-          
-          for (let t = 0; t < Chess.movesList.length - 2; t += 2)
-          {
-            if (arrEquals(Chess.movesList[t], Chess.movesList[Chess.movesList.length - 2])) {Chess.movesList[t+1]++;}
-          }
-          
-          Chess.changeTurn();
 
-          
+          editMove(a);
+
           Chess.pause = 1;
-
           setTimeout(function() {if (Chess.game == 1) {Chess.pause = 0;} drawBoard(a);}, 100);
         } else
         {
-
           if ((x != a[i].x || y != a[i].y) && Chess.game == 1)
           {
             let squareColor = "#e6cdb4";
@@ -829,7 +801,36 @@ function tryToMove(i, a)
 
 
 
+function editMove(a)
+{
+  Chess.movesList[Chess.movesList.length] = [];
+          
+  let c = 0;
 
+  for (let t = 0; t < a.length; t += 1)
+  {
+    Chess.movesList[Chess.movesList.length-1][c] = a[t].x;
+    Chess.movesList[Chess.movesList.length-1][c+1] = a[t].y;
+    Chess.movesList[Chess.movesList.length-1][c+2] = a[t].type;
+    Chess.movesList[Chess.movesList.length-1][c+3] = a[t].isAlive;
+    Chess.movesList[Chess.movesList.length-1][c+4] = a[t].passant;
+    c += 5;
+  }
+          
+  Chess.movesList[Chess.movesList.length-1][c] = Chess.blackCastleRight;
+  Chess.movesList[Chess.movesList.length-1][c+1] = Chess.blackCastleLeft;
+  Chess.movesList[Chess.movesList.length-1][c+2] = Chess.whiteCastleRight;
+  Chess.movesList[Chess.movesList.length-1][c+3] = Chess.whiteCastleLeft;
+          
+  Chess.movesList[Chess.movesList.length] = 1;
+          
+  for (let t = 0; t < Chess.movesList.length - 2; t += 2)
+  {
+    if (arrEquals(Chess.movesList[t], Chess.movesList[Chess.movesList.length - 2])) {Chess.movesList[t+1]++;}
+  }
+          
+  Chess.changeTurn();
+}
 
 
 
