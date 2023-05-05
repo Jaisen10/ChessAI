@@ -50,11 +50,22 @@ class Chess
       this.y = y;
     }
     
-    realMoveTo(x, y, a)
+    realMoveTo(x, y, a, reset)
     {
+    
+
+      if (reset == 1) {return;}
+
+
+      let drawCountReset = { ...Chess }.drawCount;
+      let movesListReset = { ...Chess }.movesList;
+      let blackCastleLeftReset = { ...Chess }.blackCastleLeft;
+      let blackCastleRightReset = { ...Chess }.blackCastleRight;
+      let whiteCastleLeftReset = { ...Chess }.whiteCastleLeft;
+      let whiteCastleRightReset = { ...Chess }.whiteCastleRight;
 
       Chess.drawCount++;
-          
+        
       for (let z = 0; z < a.length; z++)
       {
 
@@ -72,7 +83,7 @@ class Chess
         {
           if (a[z].type == 4 && a[z].color == this.color && ((a[z].x > this.x) == (x > this.x)))
           {
-            a[z].realMoveTo(x+(Math.abs(this.x - x) / (this.x - x)), a[z].y, a);
+            a[z].realMoveTo(x+(Math.abs(this.x - x) / (this.x - x)), a[z].y, a, 0);
           }
         }
       }
@@ -97,8 +108,21 @@ class Chess
       
       if (this.type == 1) {Chess.movesList = [];}
       
+      
+
       this.x = x;
       this.y = y;
+
+      if (reset == 1)
+      {
+        Chess.drawCount = drawCountReset;
+        Chess.movesList = movesListReset;
+        Chess.blackCastleLeft = blackCastleLeftReset;
+        Chess.blackCastleRight = blackCastleRightReset;
+        Chess.whiteCastleLeft = whiteCastleLeftReset;
+        Chess.whiteCastleRight = whiteCastleRightReset;
+      }
+
     }
     
     promotePawn(t)
@@ -747,7 +771,7 @@ function tryToMove(i, pieces)
         if(pieces[i].canMoveTo(x, y, pieces) && pieces[i].color == Chess.turn && (Chess.mode == Chess.turn ||Chess.mode == 3))
         {
           
-          pieces[i].realMoveTo(x, y, pieces);
+          pieces[i].realMoveTo(x, y, pieces, 0);
           
           let counter = 1;
           while (counter == 1 && pieces[i].type == 1 && ((pieces[i].y == 8 && pieces[i].color == 1) || (pieces[i].y == 1 && pieces[i].color == 2)))
@@ -813,12 +837,12 @@ function computerMove(thePieces)
       for (let y = 1; y < 9; y++)
       {
 
-        if (pieces[i].canMoveTo(x, y, thePieces) && pieces[i].color == Chess.turn)
+        if (thePieces[i].canMoveTo(x, y, thePieces) && thePieces[i].color == Chess.turn)
         {
+         
           moves[moves.length] = [i, x, y]
-         // let copy = thePieces.slice();
-         // copy[i].realMoveTo(x, y, copy);
-
+          let copy = thePieces.map(obj => ({ ...obj }));
+          //copy[i].realMoveTo(x, y, copy, 1);       // THIS IS NOT WORKING FOR SOME REASON
         }
 
       }
@@ -832,7 +856,7 @@ function computerMove(thePieces)
   let xx = theMove[1];
   let yy = theMove[2];
 
-  thePieces[ii].realMoveTo(xx, yy, pieces);
+  thePieces[ii].realMoveTo(xx, yy, pieces, 0);
 
 
   if (thePieces[ii].type == 1 && ((thePieces[ii].y == 8 && thePieces[ii].color == 1) || (thePieces[ii].y == 1 && thePieces[ii].color == 2)))
