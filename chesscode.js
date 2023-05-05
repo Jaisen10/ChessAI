@@ -51,6 +51,32 @@ class Chess
     
     realMoveTo(x, y, a)
     {
+
+      Chess.drawCount++;
+          
+      for (let z = 0; z < a.length; z++)
+      {
+
+        if (a[z].x == x && a[z].y == y) {a[z].isAlive = 0; Chess.drawCount = 0; Chess.movesList = [];}
+            
+        if (this.type == 1 && this.x != x && a[z].x == x && this.y == a[z].y && a[z].passant == 1)
+        {a[z].isAlive = 0; Chess.drawCount = 0; Chess.movesList = [];}
+      }
+          
+      if (this.type == 1) {Chess.drawCount = 0;}
+          
+      if (this.type == 6 && Math.abs(x - this.x) == 2)
+      {
+        for (let z = 0; z < a.length; z++)
+        {
+          if (a[z].type == 4 && a[z].color == this.color && ((a[z].x > this.x) == (x > this.x)))
+          {
+            a[z].realMoveTo(x+(Math.abs(this.x - x) / (this.x - x)), a[z].y, a);
+          }
+        }
+      }
+
+
       if (x==1 && y==1) {Chess.blackCastleLeft = 0;}
       if (x==8 && y==1) {Chess.blackCastleRight = 0;}
       if (x==1 && y==8) {Chess.whiteCastleLeft = 0;}
@@ -456,7 +482,14 @@ document.getElementById("board").style.visibility="visible";
 let game = setInterval(myFunction, 1);
 Chess.movesList[0] = [];
 let c = 0;
-          
+
+
+
+
+
+
+
+
 for (let t = 0; t < a.length; t += 1)
 {
   Chess.movesList[0][c] = a[t].x;
@@ -472,6 +505,14 @@ Chess.movesList[0][c+2] = Chess.whiteCastleRight;
 Chess.movesList[0][c+3] = Chess.whiteCastleLeft;
 Chess.movesList[1] = 1;
 
+
+
+
+
+
+
+// highlight is the tile the current piece in hand was on; highlight2 is the tile the mouse is hovering over with piece in hand
+
 document.onmousemove = move;
 function move(event)
 {
@@ -481,12 +522,12 @@ function move(event)
     for (let y = 1; y < 9; y++)
     {
       let square = x.toString() + "$" + y.toString();
-      square = document.getElementById(square);
+      square = document.getElementById(square);       // gets all the chess tiles
       
-      if (mouseIsOver(square, event)) {Chess.highlight2 = square.id; mouse = 1}
+      if (mouseIsOver(square, event)) {Chess.highlight2 = square.id; mouse = 1}  // if mouse hovers over a tile, set variable to its id
     }
   }
-  if (mouse == 0) {Chess.highlight2 = -1}
+  if (mouse == 0) {Chess.highlight2 = -1}    // otherwise set variable to -1
   
   for (let i = 0; i < a.length && Chess.highlight != 0 && Chess.pause == 0; i++)
   {
@@ -496,13 +537,13 @@ function move(event)
     x = parseInt(x);
     y = parseInt(y);
     
-    if (a[i].x == x && a[i].y == y)
+    if (a[i].x == x && a[i].y == y)    // if the chess piece is the one that came from highlighted tile (the one in hand)
     {
       x = event.clientX + scrollX - 25;
       y = event.clientY + scrollY - 35;
       y = y.toString() + "px";
       x = x.toString() + "px";
-      document.getElementById(i.toString()).style.top=y;
+      document.getElementById(i.toString()).style.top=y;   // make chess piece go to mouse x and y
       document.getElementById(i.toString()).style.left=x;
       
       drawBoard(a);
@@ -510,10 +551,15 @@ function move(event)
   }
 }
 
+
+
+
+
+
 for(let i=0; i<a.length; i++)
 {
-  let element = document.getElementById(i.toString());
-  element.onmousedown = down;
+  let element = document.getElementById(i.toString());   // sets element to the chess piece object
+  element.onmousedown = down;                            // if mouse clicks chess piece, function down starts
   function down(event)
   {
     if (Chess.game == 1 && Chess.pause == 0)
@@ -523,9 +569,9 @@ for(let i=0; i<a.length; i++)
       y = y.toString() + "px";
       x = x.toString() + "px";
       element.style.top=y;
-      element.style.left=x;
+      element.style.left=x;                 // sets x and y of piece to mouse x and y
       let squareId = a[i].x.toString() + "$" + a[i].y.toString();
-      Chess.highlight = squareId;
+      Chess.highlight = squareId;           // sets the highlight to the id of the tile object
       document.onmouseup = function() {if (Chess.highlight == squareId) {Chess.highlight = 0; Chess.highlight2 = -1; tryToMove(i, a);}};
     }
   }
@@ -627,6 +673,21 @@ function myFunction()
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function arrEquals(arr1, arr2)
 {
   if (arr1.length != arr2.length) {return false;}
@@ -636,6 +697,18 @@ function arrEquals(arr1, arr2)
   }
   return true;
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 function mouseIsOver(square, event)
@@ -649,6 +722,18 @@ function mouseIsOver(square, event)
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 function tryToMove(i, a)
 {
   let square;
@@ -659,34 +744,12 @@ function tryToMove(i, a)
     {
       
       theId = x.toString()+"$"+y.toString();
-      square = document.getElementById(theId);
+      square = document.getElementById(theId);   // cycles through all of the tiles
       
       if (mouseIsOver(square, event))
       {
-        if(a[i].canMoveTo(x, y, a) && a[i].color == Chess.turn)
+        if(a[i].canMoveTo(x, y, a) && a[i].color == Chess.turn)  // maybe add "&& Chess.turn == (human color whatever)"
         {
-          Chess.drawCount++;
-          
-          for (let z = 0; z < a.length; z++)
-          {
-            if (a[z].x == x && a[z].y == y) {a[z].isAlive = 0; Chess.drawCount = 0; Chess.movesList = [];}
-            
-            if (a[i].type == 1 && a[i].x != x && a[z].x == x && a[i].y == a[z].y && a[z].passant == 1)
-            {a[z].isAlive = 0; Chess.drawCount = 0; Chess.movesList = [];}
-          }
-          
-          if (a[i].type == 1) {Chess.drawCount = 0;}
-          
-          if (a[i].type == 6 && Math.abs(x - a[i].x) == 2)
-          {
-            for (let z = 0; z < a.length; z++)
-            {
-              if (a[z].type == 4 && a[z].color == a[i].color && ((a[z].x > a[i].x) == (x > a[i].x)))
-              {
-                a[z].realMoveTo(x+(Math.abs(a[i].x-x) / (a[i].x-x)), a[z].y, a);
-              }
-            }
-          }
           
           a[i].realMoveTo(x, y, a);
           
@@ -727,41 +790,14 @@ function tryToMove(i, a)
           }
           
           Chess.changeTurn();
-          for (let xPos = 1; xPos < 9; xPos++)
-          {
-            for (let yPos = 1; yPos < 9; yPos++)
-            {
-              let square2 = document.getElementById(xPos.toString() + "$" + yPos.toString());
-              if ((xPos + yPos) % 2 == 1) {square2.style.backgroundColor="#ab8a68";}
-              else {square2.style.backgroundColor="#e6cdb4";}
-            }
-          }
+
           
           Chess.pause = 1;
+
           setTimeout(function() {if (Chess.game == 1) {Chess.pause = 0;} drawBoard(a);}, 100);
         } else
         {
-          let xCount = a[i].x;
-          let yCount = a[i].y;
-    
-          xCount = xCount.toString();
-          yCount = yCount.toString();
-          let thatObject = document.getElementById(xCount+"$"+yCount);
-          
-          let rect = thatObject.getBoundingClientRect();
-          let xPos = rect.x +  + 5;
-          let yPos = rect.y + scrollY  - 5;
-          xPos = xPos.toString() + "px";
-          yPos = yPos.toString() + "px";
-    
-         document.getElementById(i.toString()).style.left=xPos;
-         document.getElementById(i.toString()).style.top=yPos;
-          
-          
-          if((a[i].x + a[i].y) % 2 == 1)
-          {thatObject.style.backgroundColor="#ab8a68";}
-          else {thatObject.style.backgroundColor="#e6cdb4";}
-          
+
           if ((x != a[i].x || y != a[i].y) && Chess.game == 1)
           {
             let squareColor = "#e6cdb4";
@@ -770,19 +806,6 @@ function tryToMove(i, a)
             Chess.red = square.id;
             Chess.redCount++;
           
-            for (let xPos = 1; xPos < 9; xPos++)
-            {
-              for (let yPos = 1; yPos < 9; yPos++)
-              {
-                let square2 = document.getElementById(xPos.toString() + "$" + yPos.toString());
-                if (Chess.red != square2.id)
-                 {
-                   if ((xPos + yPos) % 2 == 1) {square2.style.backgroundColor="#ab8a68";}
-                   else {square2.style.backgroundColor="#e6cdb4";}
-                 }
-              }
-            }
-            
             setTimeout(function()
             {
               Chess.redCount--;
@@ -790,37 +813,45 @@ function tryToMove(i, a)
               {
                 theId = x.toString()+"$"+y.toString();
                 square = document.getElementById(theId);
-                square.style.backgroundColor=squareColor;
+                square.style.backgroundColor = squareColor;
                 Chess.red = 0;
               }
             }, 400);
           }
         }
-      } else
-      {
-        let xCount = a[i].x;
-        let yCount = a[i].y;
-  
-        xCount = xCount.toString();
-        yCount = yCount.toString();
-        let thatObject = document.getElementById(xCount+"$"+yCount);
-          
-        let rect = thatObject.getBoundingClientRect();
-        let xPos = rect.x + scrollX + 5;
-        let yPos = rect.y + scrollY - 5;
-        xPos = xPos.toString() + "px";
-        yPos = yPos.toString() + "px";
-    
-        document.getElementById(i.toString()).style.left=xPos;
-        document.getElementById(i.toString()).style.top=yPos;
-        
-        if((a[i].x + a[i].y) % 2 == 1)
-        {thatObject.style.backgroundColor="#ab8a68";}
-        else {thatObject.style.backgroundColor="#e6cdb4";}
       }
     }
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 function drawBoard(a)
@@ -989,6 +1020,30 @@ function drawBoard(a)
     }
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 function initializeBoard()
