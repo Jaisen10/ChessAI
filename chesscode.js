@@ -479,6 +479,8 @@ class Chess
 
 const pieces = initializeBoard();
 drawBoard(pieces);
+
+
 document.getElementById("board").style.visibility="visible";
 let game = setInterval(myFunction, 1);
 Chess.movesList[0] = [];
@@ -527,7 +529,7 @@ function move(event)
   }
   if (mouse == 0) {Chess.highlight2 = -1}    // otherwise set variable to -1
   
-  for (let i = 0; i < a.length && Chess.highlight != 0 && Chess.pause == 0; i++)
+  for (let i = 0; i < pieces.length && Chess.highlight != 0 && Chess.pause == 0; i++)
   {
     let x = Chess.highlight;
     let y = x.charAt(2);
@@ -544,7 +546,7 @@ function move(event)
       document.getElementById(i.toString()).style.top=y;   // make chess piece go to mouse x and y
       document.getElementById(i.toString()).style.left=x;
       
-      drawBoard(a);
+      drawBoard(pieces);
     }
   }
 }
@@ -552,7 +554,7 @@ function move(event)
 
 
 
-for(let i=0; i<a.length; i++)
+for(let i=0; i<pieces.length; i++)
 {
   let element = document.getElementById(i.toString());   // sets element to the chess piece object
   element.onmousedown = down;                            // if mouse clicks chess piece, function down starts
@@ -568,7 +570,7 @@ for(let i=0; i<a.length; i++)
       element.style.left=x;                 // sets x and y of piece to mouse x and y
       let squareId = pieces[i].x.toString() + "$" + pieces[i].y.toString();
       Chess.highlight = squareId;           // sets the highlight to the id of the tile object
-      document.onmouseup = function() {if (Chess.highlight == squareId) {Chess.highlight = 0; Chess.highlight2 = -1; tryToMove(i, a);}};
+      document.onmouseup = function() {if (Chess.highlight == squareId) {Chess.highlight = 0; Chess.highlight2 = -1; tryToMove(i, pieces);}};
     }
   }
 }
@@ -618,29 +620,29 @@ for(let i=0; i<a.length; i++)
 
 function myFunction()
 {
-  if (Chess.inMate(Chess.turn, a))
+  if (Chess.inMate(Chess.turn, pieces))
   {
     Chess.game = 0;
     clearInterval(game);
-    setInterval(drawBoard, 1, a);
+    setInterval(drawBoard, 1, pieces);
     if (Chess.turn == 1)
     {setTimeout(function () {alert("Game over. White wins!");}, 100);}
     else {setTimeout(function () {alert("Game over. Black wins!");}, 100);}
   }
   
-  if (Chess.inRealStalemate(Chess.turn, a))
+  if (Chess.inRealStalemate(Chess.turn, pieces))
   {
     Chess.game = 0;
     clearInterval(game);
-    setInterval(drawBoard, 1, a);
+    setInterval(drawBoard, 1, pieces);
     setTimeout(function () {alert("Game over due to stalemate.");}, 100);
   }
   
-  if (Chess.drawIm(a))
+  if (Chess.drawIm(pieces))
   {
     Chess.game = 0;
     clearInterval(game);
-    setInterval(drawBoard, 1, a);
+    setInterval(drawBoard, 1, pieces);
     setTimeout(function () {alert("Game over due to insufficient mating material.");}, 100);
   }
   
@@ -648,7 +650,7 @@ function myFunction()
   {
     Chess.game = 0;
     clearInterval(game);
-    setInterval(drawBoard, 1, a);
+    setInterval(drawBoard, 1, pieces);
     setTimeout(function () {alert("Game over because no piece was captured and no pawn moved in the previous 50 moves.");}, 100);
   }
   
@@ -658,12 +660,12 @@ function myFunction()
     {
       Chess.game = 0;
       clearInterval(game);
-      setInterval(drawBoard, 1, a);
+      setInterval(drawBoard, 1, pieces);
       setTimeout(function () {alert("Game over due to repetition.");}, 100);
     }
   }
 
-  drawBoard(a);
+  drawBoard(pieces);
 }
 
 
@@ -728,7 +730,7 @@ function mouseIsOver(square, event)
 
 
 
-function tryToMove(i, a)
+function tryToMove(i, pieces)
 {
   let square;
   let theId;
@@ -742,32 +744,32 @@ function tryToMove(i, a)
       
       if (mouseIsOver(square, event))
       {
-        if(a[i].canMoveTo(x, y, a) && a[i].color == Chess.turn && (Chess.mode == Chess.turn ||Chess.mode == 3))
+        if(pieces[i].canMoveTo(x, y, pieces) && pieces[i].color == Chess.turn && (Chess.mode == Chess.turn ||Chess.mode == 3))
         {
           
-          a[i].realMoveTo(x, y, a);
+          pieces[i].realMoveTo(x, y, pieces);
           
           let counter = 1;
-          while (counter == 1 && a[i].type == 1 && ((a[i].y == 8 && a[i].color == 1) || (a[i].y == 1 && a[i].color == 2)))
+          while (counter == 1 && pieces[i].type == 1 && ((pieces[i].y == 8 && pieces[i].color == 1) || (pieces[i].y == 1 && pieces[i].color == 2)))
           {
             let prom = prompt("What to promote to?");
-            if (prom == "knight") {counter = 0; a[i].promotePawn(2);}
-            if (prom == "bishop") {counter = 0; a[i].promotePawn(3);}
-            if (prom == "rook") {counter = 0; a[i].promotePawn(4);}
-            if (prom == "queen") {counter = 0; a[i].promotePawn(5);}
+            if (prom == "knight") {counter = 0; pieces[i].promotePawn(2);}
+            if (prom == "bishop") {counter = 0; pieces[i].promotePawn(3);}
+            if (prom == "rook") {counter = 0; pieces[i].promotePawn(4);}
+            if (prom == "queen") {counter = 0; pieces[i].promotePawn(5);}
           }
           
-          editMove(a);
+          editMove(pieces);
          
           Chess.pause = 1;
 
-          computerMove(a);
+          computerMove(pieces);
 
 
-          setTimeout(function() {if (Chess.game == 1) {Chess.pause = 0;} drawBoard(a);}, 100);
+          setTimeout(function() {if (Chess.game == 1) {Chess.pause = 0;} drawBoard(pieces);}, 100);
         } else
         {
-          if ((x != a[i].x || y != a[i].y) && Chess.game == 1)
+          if ((x != pieces[i].x || y != pieces[i].y) && Chess.game == 1)
           {
             let squareColor = "#e6cdb4";
             if ((x + y) % 2 == 1) {squareColor = "#ab8a68";}
@@ -799,23 +801,23 @@ function tryToMove(i, a)
 
 
 
-function computerMove(a)
+function computerMove(thePieces)
 {
 
   let moves = [];
 
-  for(let i = 0; i < a.length; i++)
+  for(let i = 0; i < thePieces.length; i++)
   {
     for (let x = 1; x < 9; x++)
     {
       for (let y = 1; y < 9; y++)
       {
 
-        if (a[i].canMoveTo(x, y, a) && a[i].color == Chess.turn)
+        if (pieces[i].canMoveTo(x, y, thePieces) && pieces[i].color == Chess.turn)
         {
           moves[moves.length] = [i, x, y]
-          let copy = a.slice();
-          copy[i].realMoveTo(x, y, copy);
+         // let copy = thePieces.slice();
+         // copy[i].realMoveTo(x, y, copy);
 
         }
 
@@ -830,17 +832,17 @@ function computerMove(a)
   let xx = theMove[1];
   let yy = theMove[2];
 
-  a[ii].realMoveTo(xx, yy, a);
+  thePieces[ii].realMoveTo(xx, yy, pieces);
 
 
-  if (a[ii].type == 1 && ((a[ii].y == 8 && a[ii].color == 1) || (a[ii].y == 1 && a[ii].color == 2)))
-  {a[ii].promotePawn(5);}
+  if (thePieces[ii].type == 1 && ((thePieces[ii].y == 8 && thePieces[ii].color == 1) || (thePieces[ii].y == 1 && thePieces[ii].color == 2)))
+  {thePieces[ii].promotePawn(5);}
   
-  editMove(a);
-  drawBoard(a);
+  editMove(pieces);
+  drawBoard(pieces);
 
   Chess.pause = 1;
-  setTimeout(function() {if (Chess.game == 1) {Chess.pause = 0;} drawBoard(a); if (Chess.mode != 4) {computerMove(a);}}, 1);
+  setTimeout(function() {if (Chess.game == 1) {Chess.pause = 0;} drawBoard(pieces); if (Chess.mode != 4 && Chess.game == 1) {computerMove(pieces);}}, 1);
 
 }
 
@@ -852,27 +854,27 @@ function computerMove(a)
 
 
 
-function evaluation(a)
+function evaluation(pieces)
 {
   let eval = 0;
-  for(let i = 0; i < a.length; i++)
+  for(let i = 0; i < pieces; i++)
   {
-    if (a[i].color == 1)
+    if (pieces[i].color == 1)
     {
-      if (a[i].type == 6) {eval += 10000}
-      if (a[i].type == 5) {eval += 900}
-      if (a[i].type == 4) {eval += 500}
-      if (a[i].type == 3) {eval += 300}
-      if (a[i].type == 2) {eval += 300}
-      if (a[i].type == 1) {eval += 100}
+      if (pieces[i].type == 6) {eval += 10000}
+      if (pieces[i].type == 5) {eval += 900}
+      if (pieces[i].type == 4) {eval += 500}
+      if (pieces[i].type == 3) {eval += 300}
+      if (pieces[i].type == 2) {eval += 300}
+      if (pieces[i].type == 1) {eval += 100}
     } else
     {
-      if (a[i].type == 6) {eval -= 10000}
-      if (a[i].type == 5) {eval -= 900}
-      if (a[i].type == 4) {eval -= 500}
-      if (a[i].type == 3) {eval -= 300}
-      if (a[i].type == 2) {eval -= 300}
-      if (a[i].type == 1) {eval -= 100}
+      if (pieces[i].type == 6) {eval -= 10000}
+      if (pieces[i].type == 5) {eval -= 900}
+      if (pieces[i].type == 4) {eval -= 500}
+      if (pieces[i].type == 3) {eval -= 300}
+      if (pieces[i].type == 2) {eval -= 300}
+      if (pieces[i].type == 1) {eval -= 100}
     }
   }
 
@@ -889,19 +891,19 @@ function evaluation(a)
 
 
 
-function editMove(a)
+function editMove(pieces)
 {
   Chess.movesList[Chess.movesList.length] = [];
           
   let c = 0;
 
-  for (let t = 0; t < a.length; t += 1)
+  for (let t = 0; t < pieces.length; t += 1)
   {
-    Chess.movesList[Chess.movesList.length-1][c] = a[t].x;
-    Chess.movesList[Chess.movesList.length-1][c+1] = a[t].y;
-    Chess.movesList[Chess.movesList.length-1][c+2] = a[t].type;
-    Chess.movesList[Chess.movesList.length-1][c+3] = a[t].isAlive;
-    Chess.movesList[Chess.movesList.length-1][c+4] = a[t].passant;
+    Chess.movesList[Chess.movesList.length-1][c] = pieces[t].x;
+    Chess.movesList[Chess.movesList.length-1][c+1] = pieces[t].y;
+    Chess.movesList[Chess.movesList.length-1][c+2] = pieces[t].type;
+    Chess.movesList[Chess.movesList.length-1][c+3] = pieces[t].isAlive;
+    Chess.movesList[Chess.movesList.length-1][c+4] = pieces[t].passant;
     c += 5;
   }
           
@@ -943,7 +945,7 @@ function editMove(a)
 
 
 
-function drawBoard(a)
+function drawBoard(pieces)
 { 
   if (window.innerWidth >= 480)
   {
@@ -967,13 +969,13 @@ function drawBoard(a)
     document.getElementById("board").style.top="0px";
   }
   
-  if (Chess.inCheck(2, a))
+  if (Chess.inCheck(2, pieces))
  {
    document.getElementById("1").style.textShadow="1px 1px 1.5px #Bf3232, -1px -1px 1.5px #Bf3232, -1px 1px 1.5px #Bf3232, 1px -1px 1.5px #Bf3232";
  }
   else {document.getElementById("1").style.textShadow="";}
   
-  if (Chess.inCheck(1, a))
+  if (Chess.inCheck(1, pieces))
   {
     document.getElementById("0").style.textShadow="1px 1px 1.5px #Bf3232, -1px -1px 1.5px #Bf3232, -1px 1px 1.5px #Bf3232, 1px -1px 1.5px #Bf3232";
   }
@@ -1055,10 +1057,10 @@ function drawBoard(a)
     }
   }
   
-  for (let i = 0; i < a.length && Chess.highlight == 0; i++)
+  for (let i = 0; i < pieces.length && Chess.highlight == 0; i++)
   {
-    xPosit = a[i].x - 1;
-    yPosit = a[i].y - 1;
+    xPosit = pieces[i].x - 1;
+    yPosit = pieces[i].y - 1;
     
     //if (Chess.turn == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
     //if (Chess.pause == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
@@ -1093,17 +1095,17 @@ function drawBoard(a)
       document.getElementById(i.toString()).style.top=yPosit;
     }
     
-    if (a[i].type == 2 && a[i].color == 2) {document.getElementById(i).innerHTML = "&#9816";}
-    if (a[i].type == 3 && a[i].color == 2) {document.getElementById(i).innerHTML = "&#9815";}
-    if (a[i].type == 4 && a[i].color == 2) {document.getElementById(i).innerHTML = "&#9814";}
-    if (a[i].type == 5 && a[i].color == 2) {document.getElementById(i).innerHTML = "&#9813";}
+    if (pieces[i].type == 2 && pieces[i].color == 2) {document.getElementById(i).innerHTML = "&#9816";}
+    if (pieces[i].type == 3 && pieces[i].color == 2) {document.getElementById(i).innerHTML = "&#9815";}
+    if (pieces[i].type == 4 && pieces[i].color == 2) {document.getElementById(i).innerHTML = "&#9814";}
+    if (pieces[i].type == 5 && pieces[i].color == 2) {document.getElementById(i).innerHTML = "&#9813";}
 
-    if (a[i].type == 2 && a[i].color == 1) {document.getElementById(i).innerHTML = "&#9822";}
-    if (a[i].type == 3 && a[i].color == 1) {document.getElementById(i).innerHTML = "&#9821";}
-    if (a[i].type == 4 && a[i].color == 1) {document.getElementById(i).innerHTML = "&#9820";}
-    if (a[i].type == 5 && a[i].color == 1) {document.getElementById(i).innerHTML = "&#9819";}
+    if (pieces[i].type == 2 && pieces[i].color == 1) {document.getElementById(i).innerHTML = "&#9822";}
+    if (pieces[i].type == 3 && pieces[i].color == 1) {document.getElementById(i).innerHTML = "&#9821";}
+    if (pieces[i].type == 4 && pieces[i].color == 1) {document.getElementById(i).innerHTML = "&#9820";}
+    if (pieces[i].type == 5 && pieces[i].color == 1) {document.getElementById(i).innerHTML = "&#9819";}
     
-    if (a[i].isAlive == 0)
+    if (pieces[i].isAlive == 0)
     {
       document.getElementById(i.toString()).style.display = "none";
     }
@@ -1137,44 +1139,44 @@ function drawBoard(a)
 
 function initializeBoard()
     {
-        const a = [];
+        const pieces = [];
 
-        a[0] = new Chess(5, 1, 6, 1); // black king
-        a[1] = new Chess(5, 8, 6, 2); // white king
+        pieces[0] = new Chess(5, 1, 6, 1); // black king
+        pieces[1] = new Chess(5, 8, 6, 2); // white king
 
-        a[2] = new Chess(1, 1, 4, 1); // black pieces
-        a[3] = new Chess(2, 1, 2, 1);
-        a[4] = new Chess(3, 1, 3, 1);
-        a[5] = new Chess(4, 1, 5, 1);
-        a[6] = new Chess(6, 1, 3, 1);
-        a[7] = new Chess(7, 1, 2, 1);
-        a[8] = new Chess(8, 1, 4, 1);
+        pieces[2] = new Chess(1, 1, 4, 1); // black pieces
+        pieces[3] = new Chess(2, 1, 2, 1);
+        pieces[4] = new Chess(3, 1, 3, 1);
+        pieces[5] = new Chess(4, 1, 5, 1);
+        pieces[6] = new Chess(6, 1, 3, 1);
+        pieces[7] = new Chess(7, 1, 2, 1);
+        pieces[8] = new Chess(8, 1, 4, 1);
 
-        a[9] = new Chess(1, 2, 1, 1); // black pawns
-        a[10] = new Chess(2, 2, 1, 1);
-        a[11] = new Chess(3, 2, 1, 1);
-        a[12] = new Chess(4, 2, 1, 1);
-        a[13] = new Chess(5, 2, 1, 1);
-        a[14] = new Chess(6, 2, 1, 1);
-        a[15] = new Chess(7, 2, 1, 1);
-        a[16] = new Chess(8, 2, 1, 1);
+        pieces[9] = new Chess(1, 2, 1, 1); // black pawns
+        pieces[10] = new Chess(2, 2, 1, 1);
+        pieces[11] = new Chess(3, 2, 1, 1);
+        pieces[12] = new Chess(4, 2, 1, 1);
+        pieces[13] = new Chess(5, 2, 1, 1);
+        pieces[14] = new Chess(6, 2, 1, 1);
+        pieces[15] = new Chess(7, 2, 1, 1);
+        pieces[16] = new Chess(8, 2, 1, 1);
 
-        a[17] = new Chess(1, 8, 4, 2); // white pieces
-        a[18] = new Chess(2, 8, 2, 2);
-        a[19] = new Chess(3, 8, 3, 2);
-        a[20] = new Chess(4, 8, 5, 2);
-        a[21] = new Chess(6, 8, 3, 2);
-        a[22] = new Chess(7, 8, 2, 2);
-        a[23] = new Chess(8, 8, 4, 2);
+        pieces[17] = new Chess(1, 8, 4, 2); // white pieces
+        pieces[18] = new Chess(2, 8, 2, 2);
+        pieces[19] = new Chess(3, 8, 3, 2);
+        pieces[20] = new Chess(4, 8, 5, 2);
+        pieces[21] = new Chess(6, 8, 3, 2);
+        pieces[22] = new Chess(7, 8, 2, 2);
+        pieces[23] = new Chess(8, 8, 4, 2);
 
-        a[24] = new Chess(1, 7, 1, 2); // white pawns
-        a[25] = new Chess(2, 7, 1, 2);
-        a[26] = new Chess(3, 7, 1, 2);
-        a[27] = new Chess(4, 7, 1, 2);
-        a[28] = new Chess(5, 7, 1, 2);
-        a[29] = new Chess(6, 7, 1, 2);
-        a[30] = new Chess(7, 7, 1, 2);
-        a[31] = new Chess(8, 7, 1, 2);
+        pieces[24] = new Chess(1, 7, 1, 2); // white pawns
+        pieces[25] = new Chess(2, 7, 1, 2);
+        pieces[26] = new Chess(3, 7, 1, 2);
+        pieces[27] = new Chess(4, 7, 1, 2);
+        pieces[28] = new Chess(5, 7, 1, 2);
+        pieces[29] = new Chess(6, 7, 1, 2);
+        pieces[30] = new Chess(7, 7, 1, 2);
+        pieces[31] = new Chess(8, 7, 1, 2);
 
-        return a;
+        return pieces;
     }
