@@ -6,10 +6,44 @@
  * ERROR: I can castle with my pieces there (for example, I can castle as first move)
  * 
  *
- * 
+ * IDEA: 1: Make ALL variables static        2: make another super class for chess lists
  * 
  * 
  */
+
+
+class ChessList
+{
+  constructor(x, y, type, color)
+  {
+    this.mode = 2;
+    this.turn = 2;
+    this.whiteCastleRight = 1;
+    this.whiteCastleLeft = 1;
+    this.blackCastleRight = 1;
+    this.blackCastleLeft = 1;
+    this.highlight = 0;
+    this.highlight2 = -1;
+    this.red = 0;
+    this.redCount = 0;
+    this.game = 1;
+    this.drawCount = 0;
+    this.movesList = [];
+    this.pause = 0;
+    this.thePiecesArray = initializeBoard();
+   }
+
+   changeTurn()
+    {
+      if (this.turn == 2) {this.turn = 1;} else {this.turn = 2;}
+    }
+
+    moveTo(i, x, y)
+    {
+      this.thePiecesArray[i].moveTo(x, y);
+    }
+
+}
 
 class Chess
   {
@@ -50,22 +84,44 @@ class Chess
       this.y = y;
     }
     
-    realMoveTo(x, y, a, reset)
+    realMoveTo(x, y, arr, reset)
     {
-    
 
-      if (reset == 1) {return;}
+      const a = [...arr];
+     
+      const drawCountReset = Chess.drawCount;
+      const movesListReset = Chess.movesList;
+      const blackCastleLeftReset = Chess.blackCastleLeft;
+      const blackCastleRightReset = Chess.blackCastleRight;
+      const whiteCastleLeftReset = Chess.whiteCastleLeft;
+      const whiteCastleRightReset = Chess.whiteCastleRight;
 
-
-      let drawCountReset = { ...Chess }.drawCount;
-      let movesListReset = { ...Chess }.movesList;
-      let blackCastleLeftReset = { ...Chess }.blackCastleLeft;
-      let blackCastleRightReset = { ...Chess }.blackCastleRight;
-      let whiteCastleLeftReset = { ...Chess }.whiteCastleLeft;
-      let whiteCastleRightReset = { ...Chess }.whiteCastleRight;
 
       Chess.drawCount++;
         
+
+      for (let z = 0; z < a.length && reset == 1; z++)
+      {
+        if (reset==1)
+        {
+        a[z].isAlive = 0;
+        }
+      }
+
+      if (reset == 1)
+      {
+        Chess.drawCount = drawCountReset;
+        Chess.movesList = movesListReset;
+        Chess.blackCastleLeft = blackCastleLeftReset;
+        Chess.blackCastleRight = blackCastleRightReset;
+        Chess.whiteCastleLeft = whiteCastleLeftReset;
+        Chess.whiteCastleRight = whiteCastleRightReset;
+        return;
+      }
+      
+      
+
+
       for (let z = 0; z < a.length; z++)
       {
 
@@ -74,6 +130,8 @@ class Chess
         if (this.type == 1 && this.x != x && a[z].x == x && this.y == a[z].y && a[z].passant == 1)
         {a[z].isAlive = 0; Chess.drawCount = 0; Chess.movesList = [];}
       }
+
+
           
       if (this.type == 1) {Chess.drawCount = 0;}
           
@@ -113,15 +171,6 @@ class Chess
       this.x = x;
       this.y = y;
 
-      if (reset == 1)
-      {
-        Chess.drawCount = drawCountReset;
-        Chess.movesList = movesListReset;
-        Chess.blackCastleLeft = blackCastleLeftReset;
-        Chess.blackCastleRight = blackCastleRightReset;
-        Chess.whiteCastleLeft = whiteCastleLeftReset;
-        Chess.whiteCastleRight = whiteCastleRightReset;
-      }
 
     }
     
@@ -504,7 +553,6 @@ class Chess
 const pieces = initializeBoard();
 drawBoard(pieces);
 
-
 document.getElementById("board").style.visibility="visible";
 let game = setInterval(myFunction, 1);
 Chess.movesList[0] = [];
@@ -841,8 +889,8 @@ function computerMove(thePieces)
         {
          
           moves[moves.length] = [i, x, y]
-          let copy = thePieces.map(obj => ({ ...obj }));
-          //copy[i].realMoveTo(x, y, copy, 1);       // THIS IS NOT WORKING FOR SOME REASON
+          let copy = [...thePieces];
+          copy[i].realMoveTo(x, y, copy, 1);
         }
 
       }
