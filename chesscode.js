@@ -38,12 +38,465 @@ class ChessList
       if (this.turn == 2) {this.turn = 1;} else {this.turn = 2;}
     }
 
-    moveTo(i, x, y)
+    
+    
+    drawIm()
     {
-      this.thePiecesArray[i].moveTo(x, y);
+      const arr = [];
+      
+      for (let i = 0; i < this.thePiecesArray.length; i++)
+      {
+        if (this.thePiecesArray[i].isAlive == 1 && this.thePiecesArray[i].type != 6)
+        {
+          arr[arr.length] = this.thePiecesArray[i];
+        }
+      }
+      
+      if (arr.length == 0) {return true;}
+      
+      if (arr.length == 1) {return arr[0].type == 2 || arr[0].type == 3;}
+      
+      return arr.length == 2 && arr[0].type == 3 && arr[1].type == 3 && (arr[0].x + arr[0].y) % 2 == (arr[1].x + arr[1].y) % 2;
+      
+    }
+    
+    
+    anyPieceGoTo(x, y, color)
+    {
+      for (let i=0; i<this.thePiecesArray.length; i++)
+        {
+          if (!(this.thePiecesArray[i].color == color) && this.canGoTo(i, x, y))  // this.thePiecesArray[i].canGoTo - figure this out
+          {
+            return true;
+          }
+        }
+        return false;
+    }
+    
+    
+    inCheck(color)
+    {
+        let x = 1;
+        let y = 1;
+
+        for (let i=0; i < this.thePiecesArray.length; i++)
+        {
+            if (this.thePiecesArray[i].color == color && this.thePiecesArray[i].type == 6)
+            {
+                x = this.thePiecesArray[i].x;
+                y = this.thePiecesArray[i].y;
+            }
+        }
+
+        return this.anyPieceGoTo(x, y, color);
+    }
+    
+   inRealStalemate(color)
+    {
+        return this.inStalemate(color) && !this.inCheck(color);
     }
 
+    inStalemate(color)
+    {
+        let x = 1;
+        let y = 1;
+
+        for (let i=0; i<this.thePiecesArray.length; i++)
+        {
+            if (this.thePiecesArray[i].color==color)
+            {
+                x = this.thePiecesArray[i].x;
+                y = this.thePiecesArray[i].y;
+
+                for (let xPos = 1; xPos < 9; xPos++)
+                {
+                    for (let yPos = 1; yPos < 9; yPos++)
+                    {
+                        if (this.canMoveTo(i, xPos, yPos))   // figure out this canMoveTo stuff
+                        {
+                          return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+ 
+    inMate(color)
+    {
+        return this.inCheck(color) && this.inStalemate(color);
+    }
+
+    pieceThere(x, y, color)
+    {
+      for (let i=0; i<this.thePiecesArray.length; i++)
+        {
+            if (this.thePiecesArray[i].color == color && this.thePiecesArray[i].x==x && this.thePiecesArray[i].y==y && this.thePiecesArray[i].isAlive == 1)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+  
+
+
+    // could do in ChessPiece class
+    moveTo(i, x, y)
+    {
+      this.thePiecesArray[i].x = x;
+      this.thePiecesArray[i].y = y;
+    }
+
+    
+    promotePawn(i, t)
+    {
+      this.thePiecesArray[i].type = t;
+    }
+
+
+     
+    realMoveTo(i, x, y)
+    {
+
+      this.drawCount++;
+
+
+      for (let z = 0; z < this.thePiecesArray.length; z++)
+      {
+
+        if (this.thePiecesArray[z].x == x && this.thePiecesArray[z].y == y) {this.thePiecesArray[z].isAlive = 0; this.drawCount = 0; this.movesList = [];}
+            
+        if (this.thePiecesArray[i].type == 1 && this.thePiecesArray[i].x != x && athis.thePiecesArray[z].x == x && this.thePiecesArray[i].y == this.thePiecesArray[z].y && this.thePiecesArray[z].passant == 1)
+        {this.thePiecesArray[z].isAlive = 0; this.drawCount = 0; this.movesList = [];}
+      }
+
+
+          
+      if (this.thePiecesArray[i].type == 1) {this.drawCount = 0;}
+          
+      if (this.thePiecesArray[i].type == 6 && Math.abs(x - this.thePiecesArray[i].x) == 2)
+      {
+        for (let z = 0; z < this.thePiecesArray.length; z++)
+        {
+          if (this.thePiecesArray[z].type == 4 && this.thePiecesArray[z].color == this.thePiecesArray[i].color && ((this.thePiecesArray[z].x > this.thePiecesArray[i].x) == (x > this.thePiecesArray[i].x)))
+          {
+            this.thePiecesArray[z].realMoveTo(x+(Math.abs(this.thePiecesArray[i].x - x) / (this.thePiecesArray[i].x - x)), this.thePiecesArray[z].y, this.thePiecesArray, 0);  // fix realMoveTo
+          }
+        }
+      }
+
+      if (x==1 && y==1) {this.blackCastleLeft = 0;}
+      if (x==8 && y==1) {this.blackCastleRight = 0;}
+      if (x==1 && y==8) {this.whiteCastleLeft = 0;}
+      if (x==8 && y==8) {this.whiteCastleRight = 0;}
+      
+      if (this.thePiecesArray[i].type == 4 && this.thePiecesArray[i].x == 1 && this.thePiecesArray[i].y == 1 && this.thePiecesArray[i].color == 1) {this.blackCastleLeft = 0;}
+      if (this.thePiecesArray[i].type == 4 && this.thePiecesArray[i].x == 8 && this.thePiecesArray[i].y == 1 && this.thePiecesArray[i].color == 1) {this.blackCastleRight = 0;}
+      if (this.thePiecesArray[i].type == 4 && this.thePiecesArray[i].x == 1 && this.thePiecesArray[i].y == 8 && this.thePiecesArray[i].color == 2) {this.whiteCastleLeft = 0;}
+      if (this.thePiecesArray[i].type == 4 && this.thePiecesArray[i].x == 8 && this.thePiecesArray[i].y == 8 && this.thePiecesArray[i].color == 2) {this.whiteCastleRight = 0;}
+      
+      if (this.thePiecesArray[i].type == 6 && this.thePiecesArray[i].color == 2) {this.whiteCastleLeft = 0; this.whiteCastleRight = 0;}
+      if (this.thePiecesArray[i].type == 6 && this.thePiecesArray[i].color == 1) {this.blackCastleLeft = 0; this.blackCastleRight = 0;}
+                
+      for (let j = 0; j < this.thePiecesArray.length; j++) {this.thePiecesArray[j].passant = 0;}
+      
+      if (this.thePiecesArray[i].type == 1 && Math.abs(this.thePiecesArray[i].y - y) == 2) {this.thePiecesArray[i].passant = 1;}
+      
+      if (this.thePiecesArray[i].type == 1) {this.movesList = [];}
+      
+
+      this.thePiecesArray[i].x = x;
+      this.thePiecesArray[i].y = y;
+
+    }
+
+    
+    
+
+    canMoveTo(i, newX, newY)
+    {
+        let x = this.thePiecesArray[i].x;
+        let y = this.thePiecesArray[i].y;
+        let ic = 999;
+
+        if (this.canGoTo(i, newX, newY) == true) // fix canGoTo
+        {
+          for (let j = 0; j < a.length; j++)
+          {
+            if (this.thePiecesArray[j].x == newX && this.thePiecesArray[j].y == newY && this.thePiecesArray[j].isAlive == 1) {this.thePiecesArray[j].isAlive = 0; ic = j;}
+                                    
+            if (this.thePiecesArray[i].type == 1 && this.thePiecesArray[i].x != newX && this.thePiecesArray[j].x == newX && this.thePiecesArray[j].y == this.thePiecesArray[i].y && this.thePiecesArray[j].passant == 1 && this.thePiecesArray[j].isAlive == 1)
+            {this.thePiecesArray[j].isAlive = 0; ic = j;}
+          }  
+          this.moveTo(i, newX, newY);  // fix moveTo
+          
+          if (this.inCheck(this.thePiecesArray[i].color))
+          {
+            this.moveTo(i, x, y);  // fix moveTo
+            if (ic < 500) {this.thePiecesArray[ic].isAlive = 1;}
+            return false;
+          }
+          this.moveTo(i, x, y);  // fix moveTo
+          if (ic < 500) {this.thePiecesArray[ic].isAlive = 1;}
+          return true;
+        }
+
+        return false;
+    }
+    
+
+    
+    
+    canGoTo(i, newX, newY)   // the big transition function
+    { 
+        if (newX > 8 || newX < 1 || newY > 8 || newY < 1 || this.thePiecesArray[i].isAlive == 0) {return false;}
+
+        if (this.thePiecesArray[i].type == 1) // pawn
+        {
+            if (this.thePiecesArray[i].color == 1) // black
+            {
+                if (newX == this.thePiecesArray[i].x && newY == this.thePiecesArray[i].y+1)
+                {
+                    return !this.pieceThere(newX, newY, 1) && !this.pieceThere(newX, newY, 2);  // fix pieceThere and anyPieceGoTo (ALL OF THEM)
+                }
+
+                if (this.thePiecesArray[i].y == 2 && newY == this.thePiecesArray[i].y+2 && newX == this.thePiecesArray[i].x)
+                {
+                    if (this.pieceThere(this.thePiecesArray[i].x, this.thePiecesArray[i].y+1, 1) || this.pieceThere(this.thePiecesArray[i].x, this.thePiecesArray[i].y+1, 2)) {return false;}
+
+                    return !this.pieceThere(newX, newY, 1) && !this.pieceThere(newX, newY, 2);
+                }
+
+                if (Math.abs(newX - this.thePiecesArray[i].x) == 1 && newY - this.thePiecesArray[i].y == 1)
+                {
+                  
+                  if (!this.pieceThere(newX, newY, 2))
+                  {
+                    for (let i = 0; i < a.length; i++)
+                    {
+                      if (a[i].color == 2 && a[i].passant == 1 && a[i].x == newX && a[i].y == this.y) {return true;}
+                    }
+                    return false;
+                  }
+             
+                  return this.pieceThere(newX, newY, 2) && !this.pieceThere(newX, newY, 1);
+                }
+            }
+
+            if (this.thePiecesArray[i].color == 2) // white
+            {
+                if (newX == this.thePiecesArray[i].x && newY == this.thePiecesArray[i].y-1)
+                {
+                    return !this.pieceThere(newX, newY, 1) && !this.pieceThere(newX, newY, 2);
+                }
+
+                if (this.thePiecesArray[i].y == 7 && newY == this.thePiecesArray[i].y-2 && newX == this.thePiecesArray[i].x)
+                {
+                    if (this.pieceThere(this.thePiecesArray[i].x, this.thePiecesArray[i].y-1, 1) || this.pieceThere(this.thePiecesArray[i].x, this.thePiecesArray[i].y-1, 2)) {return false;}
+
+                    return !this.pieceThere(newX, newY, 1) && !this.pieceThere(newX, newY, 2);
+                }
+
+                if (Math.abs(newX - this.thePiecesArray[i].x) == 1 && this.thePiecesArray[i].y - newY == 1)
+                {
+                  
+                  if (!this.pieceThere(newX, newY, 1))
+                  {
+                    for (let j = 0; j < a.length; j++)
+                    {
+                      if (a[j].color == 1 && a[j].passant == 1 && a[j].x == newX && a[j].y == this.thePiecesArray[i].y) {return true;}
+                    }
+                    return false;
+                  }  
+                  
+                  return this.pieceThere(newX, newY, 1) && !this.pieceThere(newX, newY, 2);
+                }
+            }
+        }
+
+        if (this.thePiecesArray[i].type == 2) // knight
+        {
+            if ((Math.abs(newX - this.thePiecesArray[i].x) == 1 && Math.abs(newY - this.thePiecesArray[i].y) == 2) || (Math.abs(newX - this.thePiecesArray[i].x) == 2 && Math.abs(newY - this.thePiecesArray[i].y) == 1))
+            {              
+              return !this.pieceThere(newX, newY, this.thePiecesArray[i].color);
+              ;
+            }
+
+            return false;
+        }
+
+        if (this.thePiecesArray[i].type == 3) // bishop
+        {
+            if (!(Math.abs(newX - this.thePiecesArray[i].x) / Math.abs(newY - this.thePiecesArray[i].y) == 1)) {return false;}
+
+            let numX = (newX - this.thePiecesArray[i].x) / Math.abs(newX - this.thePiecesArray[i].x);
+            let numY = (newY - this.thePiecesArray[i].y) / Math.abs(newY - this.thePiecesArray[i].y);
+
+            for (let j = 1; j < Math.abs(newX - this.x); j++)
+            {
+                if (this.pieceThere(this.thePiecesArray[i].x + numX*j, this.thePiecesArray[i].y + numY*j, 1)) {return false;}
+                if (this.pieceThere(this.thePiecesArray[i].x + numX*j, this.thePiecesArray[i].y + numY*j, 2)) {return false;}
+            }
+
+            return !this.pieceThere(newX, newY, this.thePiecesArray[i].color);
+        }
+
+        if (this.thePiecesArray[i].type == 4) // rook
+        {
+            if (!(newX == this.thePiecesArray[i].x ^ newY == this.thePiecesArray[i].y)) {return false;}
+
+            let num;
+
+            for (let j = 1; j < Math.max(Math.abs(newX - this.thePiecesArray[i].x), Math.abs(newY - this.thePiecesArray[i].y)); j++)
+            {
+                if (newY == this.thePiecesArray[i].y)
+                {
+                    num = (newX - this.thePiecesArray[i].x) / Math.abs(newX - this.thePiecesArray[i].x);
+
+                    if (this.pieceThere(this.thePiecesArray[i].x + num*j, this.thePiecesArray[i].y, 1) || this.pieceThere(this.thePiecesArray[i].x + num*j, this.thePiecesArray[i].y, 2)) {return false;}
+                }
+
+                if (newX == this.thePiecesArray[i].x)
+                {
+                    num = (newY - this.thePiecesArray[i].y) / Math.abs(newY - this.thePiecesArray[i].y);
+
+                    if (this.pieceThere(this.thePiecesArray[i].x, this.thePiecesArray[i].y + num*j, 1) || this.pieceThere(this.thePiecesArray[i].x, this.thePiecesArray[i].y + num*j, 2)) {return false;}
+                }
+            }
+
+            return !this.pieceThere(newX, newY, this.thePiecesArray[i].color);
+        }
+
+        if (this.thePiecesArray[i].type == 5) // queen
+        {
+            if (!(newX == this.thePiecesArray[i].x ^ newY == this.thePiecesArray[i].y) && !(Math.abs(newX - this.thePiecesArray[i].x) / Math.abs(newY - this.thePiecesArray[i].y) == 1)) {return false;}
+
+            if (newX == this.thePiecesArray[i].x || newY == this.thePiecesArray[i].y)
+            {
+                let num;
+
+                for (let j = 1; j < Math.max(Math.abs(newX - this.thePiecesArray[i].x), Math.abs(newY - this.thePiecesArray[i].y)); j++)
+                {
+                    if (newY == this.thePiecesArray[i].y)
+                    {
+                        num = (newX - this.thePiecesArray[i].x) / Math.abs(newX - this.thePiecesArray[i].x);
+
+                        if (this.pieceThere(this.thePiecesArray[i].x + num*j, this.thePiecesArray[i].y, 1) || this.pieceThere(this.thePiecesArray[i].x + num*j, this.thePiecesArray[i].y, 2)) {return false;}
+                    }
+
+                    if (newX == this.thePiecesArray[i].x)
+                    {
+                        num = (newY - this.thePiecesArray[i].y) / Math.abs(newY - this.thePiecesArray[i].y);
+
+                        if (this.pieceThere(this.thePiecesArray[i].x, this.thePiecesArray[i].y + num*j, 1) || this.pieceThere(this.thePiecesArray[i].x, this.thePiecesArray[i].y + num*j, 2)) {return false;}
+                    }
+                }
+            }
+
+            else
+            {
+                let numX = (newX - this.thePiecesArray[i].x) / Math.abs(newX - this.thePiecesArray[i].x);
+                let numY = (newY - this.thePiecesArray[i].y) / Math.abs(newY - this.thePiecesArray[i].y);
+
+                for (let j = 1; j < Math.abs(newX - this.thePiecesArray[i].x); j++)
+                {
+                    if (this.pieceThere(this.thePiecesArray[i].x + numX*j, this.thePiecesArray[i].y + numY*j, 1)) {return false;}
+                    if (this.pieceThere(this.thePiecesArray[i].x + numX*j, this.thePiecesArray[i].y + numY*j, 2)) {return false;}
+                }
+            }
+
+            return !this.pieceThere(newX, newY, this.thePiecesArray[i].color);
+        }
+
+        if (this.thePiecesArray[i].type == 6) // king
+        {
+          
+          if (newY == this.thePiecesArray[i].y && Math.abs(newX - this.thePiecesArray[i].x) == 2)
+          {
+            if (this.thePiecesArray[i].color == 2 && newX > this.thePiecesArray[i].x)
+            {
+              return this.whiteCastleRight==1 && !this.anyPieceGoTo(5, 8, this.thePiecesArray[i].color) && !this.anyPieceGoTo(6, 8, this.thePiecesArray[i].color) && !this.anyPieceGoTo(7, 8, this.thePiecesArray[i].color);
+            }
+            
+            if (this.thePiecesArray[i].color == 2 && newX < this.thePiecesArray[i].x)
+            {
+              return this.whiteCastleLeft==1 && !this.anyPieceGoTo(5, 8, this.thePiecesArray[i].color) && !this.anyPieceGoTo(4, 8, this.thePiecesArray[i].color) && !this.anyPieceGoTo(3, 8, this.thePiecesArray[i].color);
+            }
+            
+            if (this.thePiecesArray[i].color == 1 && newX > this.thePiecesArray[i].x)
+            {
+              return this.blackCastleRight==1 && !this.anyPieceGoTo(5, 1, this.thePiecesArray[i].color) && !this.anyPieceGoTo(6, 1, this.thePiecesArray[i].color) && !this.anyPieceGoTo(7, 1, this.thePiecesArray[i].color);
+            }
+            
+            if (this.thePiecesArray[i].color == 1 && newX < this.thePiecesArray[i].x)
+            {
+              return this.blackCastleRight==1 && !this.anyPieceGoTo(5, 1, this.thePiecesArray[i].color) && !this.anyPieceGoTo(4, 1, this.thePiecesArray[i].color) && !this.anyPieceGoTo(3, 1, this.thePiecesArray[i].color);
+            }
+          }
+          
+          
+          return (Math.abs(newX - this.thePiecesArray[i].x) < 2 && Math.abs(newY - this.thePiecesArray[i].y) < 2) && !(newX == this.thePiecesArray[i].x && newY == this.thePiecesArray[i].y) && !this.pieceThere(newX, newY, this.thePiecesArray[i].color);
+        }
+
+        return false;
+    }
+  
+
 }
+
+
+
+
+
+
+class Chess
+  {
+    
+    constructor(x, y, type, color)
+    {
+        this.x = x;
+        this.y = y;
+        this.type = type;
+        this.color = color;
+        this.passant = 0;
+        this.isAlive = 1;
+    }
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 class Chess
   {
