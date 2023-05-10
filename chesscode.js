@@ -5,10 +5,6 @@
  * Weight assignments for each piece in each square
  * ERROR: I can castle with my pieces there (for example, I can castle as first move)
  * 
- *
- * IDEA: 1: Make ALL variables static        2: make another super class for chess lists
- * 
- * 
  */
 
 
@@ -453,8 +449,6 @@ class ChessList
 
 
 
-
-
 class Chess
   {
     
@@ -483,7 +477,15 @@ class Chess
 
 
 
-// HERE!!!
+
+
+
+
+
+
+
+
+
 
 
 const mainList = new ChessList();
@@ -493,7 +495,13 @@ drawBoard(mainList);
 document.getElementById("board").style.visibility="visible";
 
 
+
+
+
 /*
+
+
+// HERE!!!
 
 let game = setInterval(myFunction, 1);
 Chess.movesList[0] = [];
