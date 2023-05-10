@@ -14,7 +14,7 @@
 
 class ChessList
 {
-  constructor(x, y, type, color)
+  constructor()
   {
     this.mode = 2;
     this.turn = 2;
@@ -495,7 +495,7 @@ class Chess
 
 
 
-
+/*
 
 
 class Chess
@@ -963,6 +963,7 @@ class Chess
   
 }
 
+*/
 
 
 
@@ -985,36 +986,24 @@ class Chess
 
 
 
+// HERE!!!
 
 
+const mainList = new ChessList();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const pieces = initializeBoard();
-drawBoard(pieces);
+drawBoard(mainList);
 
 document.getElementById("board").style.visibility="visible";
+
+/*
+
 let game = setInterval(myFunction, 1);
 Chess.movesList[0] = [];
 let c = 0;
 
 
 
-
-
+// HERE!!!
 
 for (let t = 0; t < pieces.length; t += 1)
 {
@@ -1037,6 +1026,9 @@ Chess.movesList[1] = 1;
 
 
 // highlight is the tile the current piece in hand was on; highlight2 is the tile the mouse is hovering over with piece in hand
+
+
+// HERE!!!
 
 document.onmousemove = move;
 function move(event)
@@ -1139,9 +1131,7 @@ for(let i=0; i<pieces.length; i++)
 
 
 
-
-
-
+// HERE!!!
 
 function myFunction()
 {
@@ -1253,7 +1243,7 @@ function mouseIsOver(square, event)
 
 
 
-
+// HERE!!!
 
 function tryToMove(i, pieces)
 {
@@ -1324,26 +1314,26 @@ function tryToMove(i, pieces)
 
 
 
+// HERE!!!
 
-
-function computerMove(thePieces)
+function computerMove(piecesList)
 {
 
   let moves = [];
 
-  for(let i = 0; i < thePieces.length; i++)
+  for(let i = 0; i < piecesList.thePiecesArray.length; i++)
   {
     for (let x = 1; x < 9; x++)
     {
       for (let y = 1; y < 9; y++)
       {
 
-        if (thePieces[i].canMoveTo(x, y, thePieces) && thePieces[i].color == Chess.turn)
+        if (piecesList.thePiecesArray[i].canMoveTo(x, y, thePieces) && piecesList.thePiecesArray[i].color == piecesList.turn) // HERE!!!!
         {
          
           moves[moves.length] = [i, x, y]
-          let copy = [...thePieces];
-          copy[i].realMoveTo(x, y, copy, 1);
+          let copy = [...piecesList];
+          copy[i].realMoveTo(x, y, copy, 1);  // HERE!!!!!
         }
 
       }
@@ -1357,17 +1347,17 @@ function computerMove(thePieces)
   let xx = theMove[1];
   let yy = theMove[2];
 
-  thePieces[ii].realMoveTo(xx, yy, pieces, 0);
+  piecesList[ii].realMoveTo(xx, yy, pieces, 0); // here!!!
 
 
-  if (thePieces[ii].type == 1 && ((thePieces[ii].y == 8 && thePieces[ii].color == 1) || (thePieces[ii].y == 1 && thePieces[ii].color == 2)))
-  {thePieces[ii].promotePawn(5);}
+  if (piecesList.thePiecesArray[ii].type == 1 && ((piecesList.thePiecesArray[ii].y == 8 && piecesList.thePiecesArray[ii].color == 1) || (piecesList.thePiecesArray[ii].y == 1 && piecesList.thePiecesArray[ii].color == 2)))
+  {piecesList[ii].promotePawn(5);}  // here!!!
   
-  editMove(pieces);
-  drawBoard(pieces);
+  editMove(piecesList);  // here!!!
+  drawBoard(piecesList);
 
-  Chess.pause = 1;
-  setTimeout(function() {if (Chess.game == 1) {Chess.pause = 0;} drawBoard(pieces); if (Chess.mode != 4 && Chess.game == 1) {computerMove(pieces);}}, 1);
+  piecesList.pause = 1;
+  setTimeout(function() {if (piecesList.game == 1) {piecesList.pause = 0;} drawBoard(piecesList); if (piecesList.mode != 4 && piecesList.game == 1) {computerMove(piecesList);}}, 1);
 
 }
 
@@ -1414,37 +1404,35 @@ function evaluation(pieces)
 
 
 
-
-
-function editMove(pieces)
+function editMove(piecesList)
 {
-  Chess.movesList[Chess.movesList.length] = [];
+  piecesList.movesList[piecesList.movesList.length] = [];
           
   let c = 0;
 
   for (let t = 0; t < pieces.length; t += 1)
   {
-    Chess.movesList[Chess.movesList.length-1][c] = pieces[t].x;
-    Chess.movesList[Chess.movesList.length-1][c+1] = pieces[t].y;
-    Chess.movesList[Chess.movesList.length-1][c+2] = pieces[t].type;
-    Chess.movesList[Chess.movesList.length-1][c+3] = pieces[t].isAlive;
-    Chess.movesList[Chess.movesList.length-1][c+4] = pieces[t].passant;
+    piecesList.movesList[piecesList.movesList.length-1][c] = piecesList.thePiecesArray[t].x;
+    piecesList.movesList[piecesList.movesList.length-1][c+1] = piecesList.thePiecesArray[t].y;
+    piecesList.movesList[piecesList.movesList.length-1][c+2] = piecesList.thePiecesArray[t].type;
+    piecesList.movesList[piecesList.movesList.length-1][c+3] = piecesList.thePiecesArray[t].isAlive;
+    piecesList.movesList[piecesList.movesList.length-1][c+4] = piecesList.thePiecesArray[t].passant;
     c += 5;
   }
           
-  Chess.movesList[Chess.movesList.length-1][c] = Chess.blackCastleRight;
-  Chess.movesList[Chess.movesList.length-1][c+1] = Chess.blackCastleLeft;
-  Chess.movesList[Chess.movesList.length-1][c+2] = Chess.whiteCastleRight;
-  Chess.movesList[Chess.movesList.length-1][c+3] = Chess.whiteCastleLeft;
+  piecesList.movesList[piecesList.movesList.length-1][c] = piecesList.blackCastleRight;
+  piecesList.movesList[piecesList.movesList.length-1][c+1] = piecesList.blackCastleLeft;
+  piecesList.movesList[piecesList.movesList.length-1][c+2] = piecesList.whiteCastleRight;
+  piecesList.movesList[piecesList.movesList.length-1][c+3] = piecesList.whiteCastleLeft;
           
-  Chess.movesList[Chess.movesList.length] = 1;
+  piecesList.movesList[piecesList.movesList.length] = 1;
           
-  for (let t = 0; t < Chess.movesList.length - 2; t += 2)
+  for (let t = 0; t < piecesList.movesList.length - 2; t += 2)
   {
-    if (arrEquals(Chess.movesList[t], Chess.movesList[Chess.movesList.length - 2])) {Chess.movesList[t+1]++;}
+    if (arrEquals(piecesList.movesList[t], piecesList.movesList[piecesList.movesList.length - 2])) {piecesList.movesList[t+1]++;}
   }
           
-  Chess.changeTurn();
+  piecesList.changeTurn();
 }
 
 
@@ -1453,6 +1441,7 @@ function editMove(pieces)
 
 
 
+*/
 
 
 
@@ -1467,11 +1456,9 @@ function editMove(pieces)
 
 
 
-
-
-
-function drawBoard(pieces)
+function drawBoard(piecesList)
 { 
+
   if (window.innerWidth >= 480)
   {
     document.body.style.overflowX="hidden";
@@ -1494,13 +1481,13 @@ function drawBoard(pieces)
     document.getElementById("board").style.top="0px";
   }
   
-  if (Chess.inCheck(2, pieces))
+  if (piecesList.inCheck(2))
  {
    document.getElementById("1").style.textShadow="1px 1px 1.5px #Bf3232, -1px -1px 1.5px #Bf3232, -1px 1px 1.5px #Bf3232, 1px -1px 1.5px #Bf3232";
  }
   else {document.getElementById("1").style.textShadow="";}
   
-  if (Chess.inCheck(1, pieces))
+  if (piecesList.inCheck(1))
   {
     document.getElementById("0").style.textShadow="1px 1px 1.5px #Bf3232, -1px -1px 1.5px #Bf3232, -1px 1px 1.5px #Bf3232, 1px -1px 1.5px #Bf3232";
   }
@@ -1559,13 +1546,14 @@ function drawBoard(pieces)
     arr2[i].style.top=yPosit;
     arr2[i].style.left=xPosit;
   }
+
   
   for (let xPos = 1; xPos < 9; xPos++)
   {
     for (let yPos = 1; yPos < 9; yPos++)
     {
       square = document.getElementById(xPos.toString() + "$" + yPos.toString());
-      if (Chess.red != square.id)
+      if (piecesList.red != square.id)
       {
         if ((xPos + yPos) % 2 == 1) {square.style.backgroundColor="#ab8a68";}
         else {square.style.backgroundColor="#e6cdb4";}
@@ -1573,19 +1561,21 @@ function drawBoard(pieces)
     }
   }
   
-  if (Chess.highlight != 0)
+
+  if (piecesList.highlight != 0)
   {
-    document.getElementById(Chess.highlight).style.backgroundColor="#967694";
-    if (Chess.highlight2 != -1)
+    document.getElementById(piecesList.highlight).style.backgroundColor="#967694";
+    if (piecesList.highlight2 != -1)
     {
-      document.getElementById(Chess.highlight2).style.backgroundColor="#967694";
+      document.getElementById(piecesList.highlight2).style.backgroundColor="#967694";
     }
   }
-  
-  for (let i = 0; i < pieces.length && Chess.highlight == 0; i++)
+
+  for (let i = 0; i < piecesList.thePiecesArray.length && piecesList.highlight == 0; i++)
   {
-    xPosit = pieces[i].x - 1;
-    yPosit = pieces[i].y - 1;
+    xPosit = piecesList.thePiecesArray[i].x - 1;
+    yPosit = piecesList.thePiecesArray[i].y - 1;
+
     
     //if (Chess.turn == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
     //if (Chess.pause == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
@@ -1620,25 +1610,24 @@ function drawBoard(pieces)
       document.getElementById(i.toString()).style.top=yPosit;
     }
     
-    if (pieces[i].type == 2 && pieces[i].color == 2) {document.getElementById(i).innerHTML = "&#9816";}
-    if (pieces[i].type == 3 && pieces[i].color == 2) {document.getElementById(i).innerHTML = "&#9815";}
-    if (pieces[i].type == 4 && pieces[i].color == 2) {document.getElementById(i).innerHTML = "&#9814";}
-    if (pieces[i].type == 5 && pieces[i].color == 2) {document.getElementById(i).innerHTML = "&#9813";}
+    if (piecesList.thePiecesArray[i].type == 2 && piecesList.thePiecesArray[i].color == 2) {document.getElementById(i).innerHTML = "&#9816";}
+    if (piecesList.thePiecesArray[i].type == 3 && piecesList.thePiecesArray[i].color == 2) {document.getElementById(i).innerHTML = "&#9815";}
+    if (piecesList.thePiecesArray[i].type == 4 && piecesList.thePiecesArray[i].color == 2) {document.getElementById(i).innerHTML = "&#9814";}
+    if (piecesList.thePiecesArray[i].type == 5 && piecesList.thePiecesArray[i].color == 2) {document.getElementById(i).innerHTML = "&#9813";}
 
-    if (pieces[i].type == 2 && pieces[i].color == 1) {document.getElementById(i).innerHTML = "&#9822";}
-    if (pieces[i].type == 3 && pieces[i].color == 1) {document.getElementById(i).innerHTML = "&#9821";}
-    if (pieces[i].type == 4 && pieces[i].color == 1) {document.getElementById(i).innerHTML = "&#9820";}
-    if (pieces[i].type == 5 && pieces[i].color == 1) {document.getElementById(i).innerHTML = "&#9819";}
+    if (piecesList.thePiecesArray[i].type == 2 && piecesList.thePiecesArray[i].color == 1) {document.getElementById(i).innerHTML = "&#9822";}
+    if (piecesList.thePiecesArray[i].type == 3 && piecesList.thePiecesArray[i].color == 1) {document.getElementById(i).innerHTML = "&#9821";}
+    if (piecesList.thePiecesArray[i].type == 4 && piecesList.thePiecesArray[i].color == 1) {document.getElementById(i).innerHTML = "&#9820";}
+    if (piecesList.thePiecesArray[i].type == 5 && piecesList.thePiecesArray[i].color == 1) {document.getElementById(i).innerHTML = "&#9819";}
     
-    if (pieces[i].isAlive == 0)
+    if (piecesList.thePiecesArray[i].isAlive == 0)
     {
       document.getElementById(i.toString()).style.display = "none";
     }
+
   }
+
 }
-
-
-
 
 
 
