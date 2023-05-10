@@ -14,10 +14,7 @@
 
 class ChessList
 {
-
-  static boardFlips = 1;
-
-  constructor()
+  constructor(x, y, type, color)
   {
     this.mode = 2;
     this.turn = 2;
@@ -991,16 +988,10 @@ class Chess
 
 // HERE!!!
 
-
-const mainList = new ChessList();
-
-drawBoard(mainList);
+const pieces = initializeBoard();
+drawBoard(pieces);
 
 document.getElementById("board").style.visibility="visible";
-
-
-/*
-
 let game = setInterval(myFunction, 1);
 Chess.movesList[0] = [];
 let c = 0;
@@ -1095,6 +1086,8 @@ for(let i=0; i<pieces.length; i++)
     }
   }
 }
+
+
 
 
 
@@ -1320,24 +1313,24 @@ function tryToMove(i, pieces)
 
 // HERE!!!
 
-function computerMove(piecesList)
+function computerMove(thePieces)
 {
 
   let moves = [];
 
-  for(let i = 0; i < piecesList.thePiecesArray.length; i++)
+  for(let i = 0; i < thePieces.length; i++)
   {
     for (let x = 1; x < 9; x++)
     {
       for (let y = 1; y < 9; y++)
       {
 
-        if (piecesList.thePiecesArray[i].canMoveTo(x, y, thePieces) && piecesList.thePiecesArray[i].color == piecesList.turn) // HERE!!!!
+        if (thePieces[i].canMoveTo(x, y, thePieces) && thePieces[i].color == Chess.turn)
         {
          
           moves[moves.length] = [i, x, y]
-          let copy = [...piecesList];
-          copy[i].realMoveTo(x, y, copy, 1);  // HERE!!!!!
+          let copy = [...thePieces];
+          copy[i].realMoveTo(x, y, copy, 1);
         }
 
       }
@@ -1351,17 +1344,17 @@ function computerMove(piecesList)
   let xx = theMove[1];
   let yy = theMove[2];
 
-  piecesList[ii].realMoveTo(xx, yy, pieces, 0); // here!!!
+  thePieces[ii].realMoveTo(xx, yy, pieces, 0);
 
 
-  if (piecesList.thePiecesArray[ii].type == 1 && ((piecesList.thePiecesArray[ii].y == 8 && piecesList.thePiecesArray[ii].color == 1) || (piecesList.thePiecesArray[ii].y == 1 && piecesList.thePiecesArray[ii].color == 2)))
-  {piecesList[ii].promotePawn(5);}  // here!!!
+  if (thePieces[ii].type == 1 && ((thePieces[ii].y == 8 && thePieces[ii].color == 1) || (thePieces[ii].y == 1 && thePieces[ii].color == 2)))
+  {thePieces[ii].promotePawn(5);}
   
-  editMove(piecesList);  // here!!!
-  drawBoard(piecesList);
+  editMove(pieces);
+  drawBoard(pieces);
 
-  piecesList.pause = 1;
-  setTimeout(function() {if (piecesList.game == 1) {piecesList.pause = 0;} drawBoard(piecesList); if (piecesList.mode != 4 && piecesList.game == 1) {computerMove(piecesList);}}, 1);
+  Chess.pause = 1;
+  setTimeout(function() {if (Chess.game == 1) {Chess.pause = 0;} drawBoard(pieces); if (Chess.mode != 4 && Chess.game == 1) {computerMove(pieces);}}, 1);
 
 }
 
@@ -1408,35 +1401,37 @@ function evaluation(pieces)
 
 
 
-function editMove(piecesList)
+// HERE!!!
+
+function editMove(pieces)
 {
-  piecesList.movesList[piecesList.movesList.length] = [];
+  Chess.movesList[Chess.movesList.length] = [];
           
   let c = 0;
 
   for (let t = 0; t < pieces.length; t += 1)
   {
-    piecesList.movesList[piecesList.movesList.length-1][c] = piecesList.thePiecesArray[t].x;
-    piecesList.movesList[piecesList.movesList.length-1][c+1] = piecesList.thePiecesArray[t].y;
-    piecesList.movesList[piecesList.movesList.length-1][c+2] = piecesList.thePiecesArray[t].type;
-    piecesList.movesList[piecesList.movesList.length-1][c+3] = piecesList.thePiecesArray[t].isAlive;
-    piecesList.movesList[piecesList.movesList.length-1][c+4] = piecesList.thePiecesArray[t].passant;
+    Chess.movesList[Chess.movesList.length-1][c] = pieces[t].x;
+    Chess.movesList[Chess.movesList.length-1][c+1] = pieces[t].y;
+    Chess.movesList[Chess.movesList.length-1][c+2] = pieces[t].type;
+    Chess.movesList[Chess.movesList.length-1][c+3] = pieces[t].isAlive;
+    Chess.movesList[Chess.movesList.length-1][c+4] = pieces[t].passant;
     c += 5;
   }
           
-  piecesList.movesList[piecesList.movesList.length-1][c] = piecesList.blackCastleRight;
-  piecesList.movesList[piecesList.movesList.length-1][c+1] = piecesList.blackCastleLeft;
-  piecesList.movesList[piecesList.movesList.length-1][c+2] = piecesList.whiteCastleRight;
-  piecesList.movesList[piecesList.movesList.length-1][c+3] = piecesList.whiteCastleLeft;
+  Chess.movesList[Chess.movesList.length-1][c] = Chess.blackCastleRight;
+  Chess.movesList[Chess.movesList.length-1][c+1] = Chess.blackCastleLeft;
+  Chess.movesList[Chess.movesList.length-1][c+2] = Chess.whiteCastleRight;
+  Chess.movesList[Chess.movesList.length-1][c+3] = Chess.whiteCastleLeft;
           
-  piecesList.movesList[piecesList.movesList.length] = 1;
+  Chess.movesList[Chess.movesList.length] = 1;
           
-  for (let t = 0; t < piecesList.movesList.length - 2; t += 2)
+  for (let t = 0; t < Chess.movesList.length - 2; t += 2)
   {
-    if (arrEquals(piecesList.movesList[t], piecesList.movesList[piecesList.movesList.length - 2])) {piecesList.movesList[t+1]++;}
+    if (arrEquals(Chess.movesList[t], Chess.movesList[Chess.movesList.length - 2])) {Chess.movesList[t+1]++;}
   }
           
-  piecesList.changeTurn();
+  Chess.changeTurn();
 }
 
 
@@ -1445,7 +1440,6 @@ function editMove(piecesList)
 
 
 
-*/
 
 
 
@@ -1460,9 +1454,11 @@ function editMove(piecesList)
 
 
 
-function drawBoard(piecesList)
+
+// HERE!!!
+
+function drawBoard(pieces)
 { 
-
   if (window.innerWidth >= 480)
   {
     document.body.style.overflowX="hidden";
@@ -1485,13 +1481,13 @@ function drawBoard(piecesList)
     document.getElementById("board").style.top="0px";
   }
   
-  if (piecesList.inCheck(2))
+  if (Chess.inCheck(2, pieces))
  {
    document.getElementById("1").style.textShadow="1px 1px 1.5px #Bf3232, -1px -1px 1.5px #Bf3232, -1px 1px 1.5px #Bf3232, 1px -1px 1.5px #Bf3232";
  }
   else {document.getElementById("1").style.textShadow="";}
   
-  if (piecesList.inCheck(1))
+  if (Chess.inCheck(1, pieces))
   {
     document.getElementById("0").style.textShadow="1px 1px 1.5px #Bf3232, -1px -1px 1.5px #Bf3232, -1px 1px 1.5px #Bf3232, 1px -1px 1.5px #Bf3232";
   }
@@ -1517,6 +1513,9 @@ function drawBoard(piecesList)
     xPosit = parseInt(xPosit) - 1;
     yPosit = parseInt(yPosit) - 1;
     
+    //if (Chess.turn == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
+    //if (Chess.pause == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
+    
     xPosit *= 60;
     yPosit *= 60;
     
@@ -1535,6 +1534,9 @@ function drawBoard(piecesList)
     xPosit = parseInt(xPosit) - 1;
     yPosit = parseInt(yPosit) - 1;
     
+    //if (Chess.turn == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
+    //if (Chess.pause == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
+    
     xPosit *= 60;
     yPosit *= 60;
    
@@ -1544,14 +1546,13 @@ function drawBoard(piecesList)
     arr2[i].style.top=yPosit;
     arr2[i].style.left=xPosit;
   }
-
   
   for (let xPos = 1; xPos < 9; xPos++)
   {
     for (let yPos = 1; yPos < 9; yPos++)
     {
       square = document.getElementById(xPos.toString() + "$" + yPos.toString());
-      if (piecesList.red != square.id)
+      if (Chess.red != square.id)
       {
         if ((xPos + yPos) % 2 == 1) {square.style.backgroundColor="#ab8a68";}
         else {square.style.backgroundColor="#e6cdb4";}
@@ -1559,27 +1560,23 @@ function drawBoard(piecesList)
     }
   }
   
-
-  if (piecesList.highlight != 0)
+  if (Chess.highlight != 0)
   {
-    document.getElementById(piecesList.highlight).style.backgroundColor="#967694";
-    if (piecesList.highlight2 != -1)
+    document.getElementById(Chess.highlight).style.backgroundColor="#967694";
+    if (Chess.highlight2 != -1)
     {
-      document.getElementById(piecesList.highlight2).style.backgroundColor="#967694";
+      document.getElementById(Chess.highlight2).style.backgroundColor="#967694";
     }
   }
-
-  for (let i = 0; i < piecesList.thePiecesArray.length && piecesList.highlight == 0; i++)
+  
+  for (let i = 0; i < pieces.length && Chess.highlight == 0; i++)
   {
-    xPosit = piecesList.thePiecesArray[i].x - 1;
-    yPosit = piecesList.thePiecesArray[i].y - 1;
-
-    if (ChessList.boardFlips == 1)
-    {
-      if (piecesList.turn == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
-      if (piecesList.pause == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
-    }
-
+    xPosit = pieces[i].x - 1;
+    yPosit = pieces[i].y - 1;
+    
+    //if (Chess.turn == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
+    //if (Chess.pause == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
+    
     xPosit *= 60;
     yPosit *= 60;
     
@@ -1610,23 +1607,21 @@ function drawBoard(piecesList)
       document.getElementById(i.toString()).style.top=yPosit;
     }
     
-    if (piecesList.thePiecesArray[i].type == 2 && piecesList.thePiecesArray[i].color == 2) {document.getElementById(i).innerHTML = "&#9816";}
-    if (piecesList.thePiecesArray[i].type == 3 && piecesList.thePiecesArray[i].color == 2) {document.getElementById(i).innerHTML = "&#9815";}
-    if (piecesList.thePiecesArray[i].type == 4 && piecesList.thePiecesArray[i].color == 2) {document.getElementById(i).innerHTML = "&#9814";}
-    if (piecesList.thePiecesArray[i].type == 5 && piecesList.thePiecesArray[i].color == 2) {document.getElementById(i).innerHTML = "&#9813";}
+    if (pieces[i].type == 2 && pieces[i].color == 2) {document.getElementById(i).innerHTML = "&#9816";}
+    if (pieces[i].type == 3 && pieces[i].color == 2) {document.getElementById(i).innerHTML = "&#9815";}
+    if (pieces[i].type == 4 && pieces[i].color == 2) {document.getElementById(i).innerHTML = "&#9814";}
+    if (pieces[i].type == 5 && pieces[i].color == 2) {document.getElementById(i).innerHTML = "&#9813";}
 
-    if (piecesList.thePiecesArray[i].type == 2 && piecesList.thePiecesArray[i].color == 1) {document.getElementById(i).innerHTML = "&#9822";}
-    if (piecesList.thePiecesArray[i].type == 3 && piecesList.thePiecesArray[i].color == 1) {document.getElementById(i).innerHTML = "&#9821";}
-    if (piecesList.thePiecesArray[i].type == 4 && piecesList.thePiecesArray[i].color == 1) {document.getElementById(i).innerHTML = "&#9820";}
-    if (piecesList.thePiecesArray[i].type == 5 && piecesList.thePiecesArray[i].color == 1) {document.getElementById(i).innerHTML = "&#9819";}
+    if (pieces[i].type == 2 && pieces[i].color == 1) {document.getElementById(i).innerHTML = "&#9822";}
+    if (pieces[i].type == 3 && pieces[i].color == 1) {document.getElementById(i).innerHTML = "&#9821";}
+    if (pieces[i].type == 4 && pieces[i].color == 1) {document.getElementById(i).innerHTML = "&#9820";}
+    if (pieces[i].type == 5 && pieces[i].color == 1) {document.getElementById(i).innerHTML = "&#9819";}
     
-    if (piecesList.thePiecesArray[i].isAlive == 0)
+    if (pieces[i].isAlive == 0)
     {
       document.getElementById(i.toString()).style.display = "none";
     }
-
   }
-
 }
 
 
@@ -1650,6 +1645,9 @@ function drawBoard(piecesList)
 
 
 
+
+
+// HERE!!!
 
 function initializeBoard()
     {
