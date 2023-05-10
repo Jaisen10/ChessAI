@@ -104,6 +104,7 @@ class ChessList
         {
             if (this.thePiecesArray[i].color==color)
             {
+              
                 x = this.thePiecesArray[i].x;
                 y = this.thePiecesArray[i].y;
 
@@ -111,7 +112,7 @@ class ChessList
                 {
                     for (let yPos = 1; yPos < 9; yPos++)
                     {
-                        if (this.canMoveTo(i, xPos, yPos))   // figure out this canMoveTo stuff
+                        if (this.canMoveTo(i, xPos, yPos))   // canMoveTo is messing up
                         {
                           return false;
                         }
@@ -141,8 +142,6 @@ class ChessList
     }
   
 
-
-    // could do in ChessPiece class
     moveTo(i, x, y)
     {
       this.thePiecesArray[i].x = x;
@@ -223,10 +222,10 @@ class ChessList
 
         if (this.canGoTo(i, newX, newY) == true) // fix canGoTo
         {
-          for (let j = 0; j < a.length; j++)
+          for (let j = 0; j < this.thePiecesArray.length; j++)
           {
             if (this.thePiecesArray[j].x == newX && this.thePiecesArray[j].y == newY && this.thePiecesArray[j].isAlive == 1) {this.thePiecesArray[j].isAlive = 0; ic = j;}
-                                    
+             
             if (this.thePiecesArray[i].type == 1 && this.thePiecesArray[i].x != newX && this.thePiecesArray[j].x == newX && this.thePiecesArray[j].y == this.thePiecesArray[i].y && this.thePiecesArray[j].passant == 1 && this.thePiecesArray[j].isAlive == 1)
             {this.thePiecesArray[j].isAlive = 0; ic = j;}
           }  
@@ -494,38 +493,27 @@ drawBoard(mainList);
 
 document.getElementById("board").style.visibility="visible";
 
+mainList.movesList[0] = [];
 
 
+let game = setInterval(myFunction, 1, mainList);  // uncomment this line to start it
 
-
-/*
-
-
-// HERE!!!
-
-let game = setInterval(myFunction, 1);
-Chess.movesList[0] = [];
 let c = 0;
 
-
-
-// HERE!!!
-
-for (let t = 0; t < pieces.length; t += 1)
+for (let t = 0; t < mainList.thePiecesArray.length; t += 1)
 {
-  Chess.movesList[0][c] = pieces[t].x;
-  Chess.movesList[0][c+1] = pieces[t].y;
-  Chess.movesList[0][c+2] = pieces[t].type;
-  Chess.movesList[0][c+3] = pieces[t].isAlive;
-  Chess.movesList[0][c+4] = pieces[t].passant;
+  mainList.movesList[0][c] = mainList.thePiecesArray[t].x;
+  mainList.movesList[0][c+1] = mainList.thePiecesArray[t].y;
+  mainList.movesList[0][c+2] = mainList.thePiecesArray[t].type;
+  mainList.movesList[0][c+3] = mainList.thePiecesArray[t].isAlive;
+  mainList.movesList[0][c+4] = mainList.thePiecesArray[t].passant;
   c += 5;
 }
-Chess.movesList[0][c] = Chess.blackCastleRight;
-Chess.movesList[0][c+1] = Chess.blackCastleLeft;
-Chess.movesList[0][c+2] = Chess.whiteCastleRight;
-Chess.movesList[0][c+3] = Chess.whiteCastleLeft;
-Chess.movesList[1] = 1;
-
+mainList.movesList[0][c] = mainList.blackCastleRight;
+mainList.movesList[0][c+1] = mainList.blackCastleLeft;
+mainList.movesList[0][c+2] = mainList.whiteCastleRight;
+mainList.movesList[0][c+3] = mainList.whiteCastleLeft;
+mainList.movesList[1] = 1;
 
 
 
@@ -533,34 +521,33 @@ Chess.movesList[1] = 1;
 
 // highlight is the tile the current piece in hand was on; highlight2 is the tile the mouse is hovering over with piece in hand
 
-
-// HERE!!!
-
 document.onmousemove = move;
 function move(event)
 {
   let mouse = 0;
-  for (let x = 1; x < 9 && Chess.highlight != 0; x++)
+  
+  for (let x = 1; x < 9 && mainList.highlight != 0; x++)
   {
+    
     for (let y = 1; y < 9; y++)
     {
       let square = x.toString() + "$" + y.toString();
       square = document.getElementById(square);       // gets all the chess tiles
       
-      if (mouseIsOver(square, event)) {Chess.highlight2 = square.id; mouse = 1}  // if mouse hovers over a tile, set variable to its id
+      if (mouseIsOver(square, event)) {mainList.highlight2 = square.id; mouse = 1}  // if mouse hovers over a tile, set variable to its id
     }
   }
-  if (mouse == 0) {Chess.highlight2 = -1}    // otherwise set variable to -1
+  if (mouse == 0) {mainList.highlight2 = -1}    // otherwise set variable to -1
   
-  for (let i = 0; i < pieces.length && Chess.highlight != 0 && Chess.pause == 0; i++)
+  for (let i = 0; i < mainList.thePiecesArray.length && mainList.highlight != 0 && mainList.pause == 0; i++)
   {
-    let x = Chess.highlight;
+    let x = mainList.highlight;
     let y = x.charAt(2);
     x = x.charAt(0);
     x = parseInt(x);
     y = parseInt(y);
     
-    if (pieces[i].x == x && pieces[i].y == y)    // if the chess piece is the one that came from highlighted tile (the one in hand)
+    if (mainList.thePiecesArray[i].x == x && mainList.thePiecesArray[i].y == y)    // if the chess piece is the one that came from highlighted tile (the one in hand)
     {
       x = event.clientX + scrollX - 25;
       y = event.clientY + scrollY - 35;
@@ -569,21 +556,20 @@ function move(event)
       document.getElementById(i.toString()).style.top=y;   // make chess piece go to mouse x and y
       document.getElementById(i.toString()).style.left=x;
       
-      drawBoard(pieces);
+      drawBoard(mainList);
     }
   }
 }
 
 
 
-
-for(let i=0; i<pieces.length; i++)
+for(let i=0; i<mainList.thePiecesArray.length; i++)
 {
   let element = document.getElementById(i.toString());   // sets element to the chess piece object
   element.onmousedown = down;                            // if mouse clicks chess piece, function down starts
   function down(event)
   {
-    if (Chess.game == 1 && Chess.pause == 0)
+    if (mainList.game == 1 && mainList.pause == 0)
     {
       let x = event.clientX + scrollX - 25;
       let y = event.clientY + scrollY - 35;
@@ -591,24 +577,27 @@ for(let i=0; i<pieces.length; i++)
       x = x.toString() + "px";
       element.style.top=y;
       element.style.left=x;                 // sets x and y of piece to mouse x and y
-      let squareId = pieces[i].x.toString() + "$" + pieces[i].y.toString();
-      Chess.highlight = squareId;           // sets the highlight to the id of the tile object
-      document.onmouseup = function() {if (Chess.highlight == squareId) {Chess.highlight = 0; Chess.highlight2 = -1; tryToMove(i, pieces);}};
+      let squareId = mainList.thePiecesArray[i].x.toString() + "$" + mainList.thePiecesArray[i].y.toString();
+      mainList.highlight = squareId;           // sets the highlight to the id of the tile object
+      document.onmouseup = function() {if (mainList.highlight == squareId) {mainList.highlight = 0; mainList.highlight2 = -1; tryToMove(i, mainList);}};
     }
   }
 }
 
 
 
+// a second copy of mouseIsOver function is far below within the massive commented section.
 
+function mouseIsOver(square, event)
+{
 
-
-
-
-
-
-
-
+  let rect = square.getBoundingClientRect();
+  if (event.clientX > rect.x && event.clientX < rect.right && event.clientY > rect.y && event.clientY < rect.bottom)
+  {
+    return true;
+  }
+  return false;
+}
 
 
 
@@ -639,57 +628,61 @@ for(let i=0; i<pieces.length; i++)
 
 // HERE!!!
 
-function myFunction()
+function myFunction(mainList)
 {
-  if (Chess.inMate(Chess.turn, pieces))
+  
+  if (mainList.inMate(mainList.turn))
   {
-    Chess.game = 0;
+    mainList.game = 0;
     clearInterval(game);
-    setInterval(drawBoard, 1, pieces);
-    if (Chess.turn == 1)
+    setInterval(drawBoard, 1, mainList);
+    if (mainList.turn == 1)
     {setTimeout(function () {alert("Game over. White wins!");}, 100);}
     else {setTimeout(function () {alert("Game over. Black wins!");}, 100);}
   }
   
-  if (Chess.inRealStalemate(Chess.turn, pieces))
+
+  // below inRealStalemate function messing up because inStalemate is messing up because canMoveTo is messing up
+  if (mainList.inRealStalemate(mainList.turn))
   {
-    Chess.game = 0;
+    mainList.game = 0;
     clearInterval(game);
-    setInterval(drawBoard, 1, pieces);
+    setInterval(drawBoard, 1, mainList);
     setTimeout(function () {alert("Game over due to stalemate.");}, 100);
   }
   
-  if (Chess.drawIm(pieces))
+
+  if (mainList.drawIm())
   {
-    Chess.game = 0;
+    mainList.game = 0;
     clearInterval(game);
-    setInterval(drawBoard, 1, pieces);
+    setInterval(drawBoard, 1, mainList);
     setTimeout(function () {alert("Game over due to insufficient mating material.");}, 100);
   }
   
-  if (Chess.drawCount > 99)
+  if (mainList.drawCount > 99)
   {
-    Chess.game = 0;
+    mainList.game = 0;
     clearInterval(game);
-    setInterval(drawBoard, 1, pieces);
+    setInterval(drawBoard, 1, mainList);
     setTimeout(function () {alert("Game over because no piece was captured and no pawn moved in the previous 50 moves.");}, 100);
   }
   
-  for (let i = 1; i < Chess.movesList.length; i += 2)
+  for (let i = 1; i < mainList.movesList.length; i += 2)
   {
-    if (Chess.movesList[i] > 2)
+    if (mainList.movesList[i] > 2)
     {
-      Chess.game = 0;
+      mainList.game = 0;
       clearInterval(game);
-      setInterval(drawBoard, 1, pieces);
+      setInterval(drawBoard, 1, mainList);
       setTimeout(function () {alert("Game over due to repetition.");}, 100);
     }
   }
 
-  drawBoard(pieces);
+  drawBoard(mainList);
 }
 
-
+/*
 
 
 
