@@ -4,6 +4,7 @@
  * Random moves
  * Weight assignments for each piece in each square
  * ERROR: I can castle with my pieces there (for example, I can castle as first move)
+ * ERROR: if i try to do the diagonal capture with pawn, but no pieces is there (or a piece of the pawns color is there), it wont work, but there will be no red highlight on the square afterwards
  * 
  */
 
