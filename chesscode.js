@@ -15,7 +15,7 @@ class ChessList
 
   constructor()
   {
-    this.mode = 2;
+    this.mode = 2;  // this is to determine whether board flips, etc.
     this.turn = 2;
     this.whiteCastleRight = 1;
     this.whiteCastleLeft = 1;
@@ -112,7 +112,7 @@ class ChessList
                 {
                     for (let yPos = 1; yPos < 9; yPos++)
                     {
-                        if (this.canMoveTo(i, xPos, yPos))   // canMoveTo is messing up
+                        if (this.canMoveTo(i, xPos, yPos))
                         {
                           return false;
                         }
@@ -181,7 +181,7 @@ class ChessList
         {
           if (this.thePiecesArray[z].type == 4 && this.thePiecesArray[z].color == this.thePiecesArray[i].color && ((this.thePiecesArray[z].x > this.thePiecesArray[i].x) == (x > this.thePiecesArray[i].x)))
           {
-            this.thePiecesArray[z].realMoveTo(x+(Math.abs(this.thePiecesArray[i].x - x) / (this.thePiecesArray[i].x - x)), this.thePiecesArray[z].y, this.thePiecesArray, 0);  // fix realMoveTo
+            this.thePiecesArray[z].realMoveTo(x+(Math.abs(this.thePiecesArray[i].x - x) / (this.thePiecesArray[i].x - x)), this.thePiecesArray[z].y, this.thePiecesArray, 0);  // fix realMoveTo!!!!!!!!!!
           }
         }
       }
@@ -495,7 +495,6 @@ document.getElementById("board").style.visibility="visible";
 
 mainList.movesList[0] = [];
 
-
 let game = setInterval(myFunction, 1, mainList);  // uncomment this line to start it
 
 let c = 0;
@@ -586,18 +585,6 @@ for(let i=0; i<mainList.thePiecesArray.length; i++)
 
 
 
-// a second copy of mouseIsOver function is far below within the massive commented section.
-
-function mouseIsOver(square, event)
-{
-
-  let rect = square.getBoundingClientRect();
-  if (event.clientX > rect.x && event.clientX < rect.right && event.clientY > rect.y && event.clientY < rect.bottom)
-  {
-    return true;
-  }
-  return false;
-}
 
 
 
@@ -607,26 +594,6 @@ function mouseIsOver(square, event)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// HERE!!!
 
 function myFunction(mainList)
 {
@@ -641,8 +608,6 @@ function myFunction(mainList)
     else {setTimeout(function () {alert("Game over. Black wins!");}, 100);}
   }
   
-
-  // below inRealStalemate function messing up because inStalemate is messing up because canMoveTo is messing up
   if (mainList.inRealStalemate(mainList.turn))
   {
     mainList.game = 0;
@@ -682,17 +647,6 @@ function myFunction(mainList)
   drawBoard(mainList);
 }
 
-/*
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -707,16 +661,6 @@ function arrEquals(arr1, arr2)
   }
   return true;
 }
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -737,14 +681,7 @@ function mouseIsOver(square, event)
 
 
 
-
-
-
-
-
-// HERE!!!
-
-function tryToMove(i, pieces)
+function tryToMove(i, mainList)
 {
   let square;
   let theId;
@@ -758,48 +695,49 @@ function tryToMove(i, pieces)
       
       if (mouseIsOver(square, event))
       {
-        if(pieces[i].canMoveTo(x, y, pieces) && pieces[i].color == Chess.turn && (Chess.mode == Chess.turn ||Chess.mode == 3))
+
+        if (mainList.canMoveTo(i, x, y) && mainList.thePiecesArray[i].color == mainList.turn && (mainList.mode == mainList.turn || mainList.mode == 3 || mainList.mode != 3)) // get this figured out (the mainList.mode == 3 thing)
         {
-          
-          pieces[i].realMoveTo(x, y, pieces, 0);
+
+          mainList.realMoveTo(i, x, y);
           
           let counter = 1;
-          while (counter == 1 && pieces[i].type == 1 && ((pieces[i].y == 8 && pieces[i].color == 1) || (pieces[i].y == 1 && pieces[i].color == 2)))
+          while (counter == 1 && mainList.thePiecesArray[i].type == 1 && ((mainList.thePiecesArray[i].y == 8 && mainList.thePiecesArray[i].color == 1) || (mainList.thePiecesArray[i].y == 1 && mainList.thePiecesArray[i].color == 2)))
           {
             let prom = prompt("What to promote to?");
-            if (prom == "knight") {counter = 0; pieces[i].promotePawn(2);}
-            if (prom == "bishop") {counter = 0; pieces[i].promotePawn(3);}
-            if (prom == "rook") {counter = 0; pieces[i].promotePawn(4);}
-            if (prom == "queen") {counter = 0; pieces[i].promotePawn(5);}
+            if (prom == "knight") {counter = 0; mainList.promotePawn(i, 2);}
+            if (prom == "bishop") {counter = 0; mainList.promotePawn(i, 3);}
+            if (prom == "rook") {counter = 0; mainList.promotePawn(i, 4);}
+            if (prom == "queen") {counter = 0; mainList.promotePawn(i, 5);}
           }
           
-          editMove(pieces);
+          editMove(mainList);   // UNCOMMENT THIS OUT WHEN FIXED
          
-          Chess.pause = 1;
+          mainList.pause = 1;
 
-          computerMove(pieces);
+          //computerMove(mainList);    // UNCOMMENT THIS OUT WHEN FIXED
 
 
-          setTimeout(function() {if (Chess.game == 1) {Chess.pause = 0;} drawBoard(pieces);}, 100);
+          setTimeout(function() {if (mainList.game == 1) {mainList.pause = 0;} drawBoard(mainList);}, 100);
         } else
         {
-          if ((x != pieces[i].x || y != pieces[i].y) && Chess.game == 1)
+          if ((x != mainList.thePiecesArray[i].x || y != mainList.thePiecesArray[i].y) && mainList.game == 1)
           {
             let squareColor = "#e6cdb4";
             if ((x + y) % 2 == 1) {squareColor = "#ab8a68";}
             square.style.backgroundColor="#Bf3232";
-            Chess.red = square.id;
-            Chess.redCount++;
+            mainList.red = square.id;
+            mainList.redCount++;
           
             setTimeout(function()
             {
-              Chess.redCount--;
-              if (Chess.redCount == 0)
+              mainList.redCount--;
+              if (mainList.redCount == 0)
               {
                 theId = x.toString()+"$"+y.toString();
                 square = document.getElementById(theId);
                 square.style.backgroundColor = squareColor;
-                Chess.red = 0;
+                mainList.red = 0;
               }
             }, 400);
           }
@@ -809,7 +747,7 @@ function tryToMove(i, pieces)
   }
 }
 
-
+/*
 
 
 
@@ -899,7 +837,7 @@ function evaluation(pieces)
 
 
 
-
+*/
 
 
 
@@ -909,7 +847,7 @@ function editMove(piecesList)
           
   let c = 0;
 
-  for (let t = 0; t < pieces.length; t += 1)
+  for (let t = 0; t < piecesList.thePiecesArray.length; t += 1)
   {
     piecesList.movesList[piecesList.movesList.length-1][c] = piecesList.thePiecesArray[t].x;
     piecesList.movesList[piecesList.movesList.length-1][c+1] = piecesList.thePiecesArray[t].y;
@@ -934,13 +872,6 @@ function editMove(piecesList)
   piecesList.changeTurn();
 }
 
-
-
-
-
-
-
-*/
 
 
 
@@ -1011,6 +942,11 @@ function drawBoard(piecesList)
     xPosit = xPosit.charAt(0);
     xPosit = parseInt(xPosit) - 1;
     yPosit = parseInt(yPosit) - 1;
+
+    if (ChessList.boardFlips == 1)
+    {
+      if (piecesList.turn == 1 || piecesList.pause == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
+    }
     
     xPosit *= 60;
     yPosit *= 60;
@@ -1030,6 +966,11 @@ function drawBoard(piecesList)
     xPosit = parseInt(xPosit) - 1;
     yPosit = parseInt(yPosit) - 1;
     
+    if (ChessList.boardFlips == 1)
+    {
+      if (piecesList.turn == 1 || piecesList.pause == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
+    }
+
     xPosit *= 60;
     yPosit *= 60;
    
@@ -1071,8 +1012,7 @@ function drawBoard(piecesList)
 
     if (ChessList.boardFlips == 1)
     {
-      if (piecesList.turn == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
-      if (piecesList.pause == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
+      if (piecesList.turn == 1 || piecesList.pause == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
     }
 
     xPosit *= 60;
