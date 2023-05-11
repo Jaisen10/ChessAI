@@ -9,6 +9,7 @@
  * incremental evaluation (evaluate fully once, then just add/subtract further things)
  * Quiescence Search (just for captures, etc.)
  * futility pruning (stop calculating if it gets super bad)
+ * make it so I need rook in corner to castle (y = 1 or 8)
  *
  */
 
@@ -1072,39 +1073,82 @@ function tryToMove(i, mainList) {
   }
 }
 
+function deepCopy(obj) {
+  const copy = new ChessList();
+
+  copy.turn = obj.turn;
+  copy.whiteCastleRight = obj.whiteCastleRight;
+  copy.whiteCastleLeft = obj.whiteCastleLeft;
+  copy.blackCastleRight = obj.blackCastleRight;
+  copy.blackCastleLeft = obj.blackCastleLeft;
+  copy.highlight = obj.highlight;
+  copy.highlight2 = obj.highlight2;
+  copy.red = obj.red;
+  copy.redCount = obj.redCount;
+  copy.game = obj.game;
+  copy.drawCount = obj.drawCount;
+
+  for (let i = 1; i < obj.movesList.length; i++) {
+    if (Array.isArray(obj.movesList[i])) {
+      copy.movesList[i] = [...obj.movesList[i]];
+    } else {
+      copy.movesList[i] = obj.movesList[i];
+    }
+  }
+
+  copy.pause = obj.pause;
+
+  for (let i = 0; i < obj.thePiecesArray.length; i++) {
+    copy.thePiecesArray[i] = { ...obj.thePiecesArray[i] };
+  }
+
+  return copy;
+}
+
 function computerMove(mainList) {
+  let depth = 2;
   let moves = [];
   let points = 0;
-  if (mainList.turn == 1) {
+  if (mainList.turn == 2) {
     points = Number.NEGATIVE_INFINITY;
   } else {
     points = Number.POSITIVE_INFINITY;
   }
+  let i;
+  let x;
+  let y;
+  let max;
+  let min;
 
-  for (let i = 0; i < mainList.thePiecesArray.length; i++) {
-    for (let x = 1; x < 9; x++) {
-      for (let y = 1; y < 9; y++) {
-        if (
-          mainList.canMoveTo(i, x, y) &&
-          mainList.thePiecesArray[i].color == mainList.turn
-        ) {
-          const copy = deepCopy(mainList);
+  for (let oneMove of getMoves(mainList)) {
+    i = oneMove[0];
+    x = oneMove[1];
+    y = oneMove[2];
 
-          copy.realMoveTo(i, x, y);
+    const copy = deepCopy(mainList);
 
-          if (
-            (mainList.turn == 1 && evaluation(copy) > points) ||
-            (mainList.turn == 2 && evaluation(copy) < points)
-          ) {
-            points = evaluation(copy);
-            moves = [];
-            moves[0] = [i, x, y];
-          }
-          if (evaluation(copy) == points) {
-            moves[moves.length] = [i, x, y];
-          }
-        }
-      }
+    copy.realMoveTo(i, x, y);
+
+    max = minimaxEval(copy, 2, true);
+    min = minimaxEval(copy, 2, false);
+
+    if (mainList.turn == 1 && max < points) {
+      points = max;
+      moves = [];
+      moves[0] = [i, x, y];
+    }
+
+    if (mainList.turn == 2 && min > points) {
+      points = min;
+      moves = [];
+      moves[0] = [i, x, y];
+    }
+
+    if (
+      (mainList.turn == 1 && max == points) ||
+      (mainList.turn == 2 && min == points)
+    ) {
+      moves[moves.length] = [i, x, y];
     }
   }
 
@@ -1143,76 +1187,103 @@ function computerMove(mainList) {
   }, 10);
 }
 
-function deepCopy(obj) {
-  const copy = new ChessList();
-
-  copy.turn = obj.turn;
-  copy.whiteCastleRight = obj.whiteCastleRight;
-  copy.whiteCastleLeft = obj.whiteCastleLeft;
-  copy.blackCastleRight = obj.blackCastleRight;
-  copy.blackCastleLeft = obj.blackCastleLeft;
-  copy.highlight = obj.highlight;
-  copy.highlight2 = obj.highlight2;
-  copy.red = obj.red;
-  copy.redCount = obj.redCount;
-  copy.game = obj.game;
-  copy.drawCount = obj.drawCount;
-
-  copy.movesList[0] = [...obj.movesList[0]]; // MAKE SURE THIS IS OKAY, WITH JUST THE FIRST AS AN ARRAY
-
-  for (let i = 1; i < obj.movesList.length; i++) {
-    copy.movesList[i] = obj.movesList[i];
+function minimaxEval(board, depth, maximizing) {
+  if (depth == 0) {
+    return evaluation(board);
   }
 
-  copy.pause = obj.pause;
+  const theCopy = deepCopy(board);
 
-  for (let i = 0; i < obj.thePiecesArray.length; i++) {
-    copy.thePiecesArray[i] = { ...obj.thePiecesArray[i] };
+  let points = 0;
+
+  if (maximizing) {
+    points = -10000000;
+
+    for (let oneMove of getMoves(board)) {
+      i = oneMove[0];
+      x = oneMove[1];
+      y = oneMove[2];
+      board.realMoveTo(i, x, y);
+      if (minimaxEval(board, depth - 1, false) > points) {
+        points = minimaxEval(board, depth - 1, false);
+      }
+      board = deepCopy(theCopy);
+    }
+  } else {
+    points = 10000000;
+    for (let oneMove of getMoves(board)) {
+      i = oneMove[0];
+      x = oneMove[1];
+      y = oneMove[2];
+      board.realMoveTo(i, x, y);
+      if (minimaxEval(board, depth - 1, true) < points) {
+        points = minimaxEval(board, depth - 1, true);
+      }
+      board = deepCopy(theCopy);
+    }
   }
 
-  return copy;
+  return points;
 }
 
-function evaluation(chessSetup) {
+function getMoves(board) {
+  moves = [];
+  for (let i = 0; i < board.thePiecesArray.length; i++) {
+    for (let x = 1; x < 9; x++) {
+      for (let y = 1; y < 9; y++) {
+        if (
+          board.canMoveTo(i, x, y) &&
+          board.thePiecesArray[i].color == mainList.turn
+        ) {
+          moves[moves.length] = [i, x, y];
+        }
+      }
+    }
+  }
+
+  return moves;
+}
+
+function evaluation(board) {
   // give some weightage for inCheck and infinite weightage for inCheckMate. if winning by evaluation then lose points for stalemate, but if losing by evaluation, then give points for stalemate. also give bishop 330 and knight 310
   let eval = 0;
-  const pieces = chessSetup.thePiecesArray;
+  const pieces = board.thePiecesArray;
   for (let i = 0; i < pieces.length; i++) {
     if (pieces[i].isAlive == 1) {
       if (pieces[i].color == 1) {
         if (pieces[i].type == 6) {
-          eval += 10000;
+          eval += 100000;
         }
         if (pieces[i].type == 5) {
-          eval += 900;
+          eval += 930;
         }
         if (pieces[i].type == 4) {
-          eval += 500;
+          eval += 480;
         }
         if (pieces[i].type == 3) {
-          eval += 300;
+          eval += 320;
         }
         if (pieces[i].type == 2) {
-          eval += 300;
+          eval += 280;
         }
         if (pieces[i].type == 1) {
           eval += 100;
         }
       } else {
         if (pieces[i].type == 6) {
-          eval -= 10000;
+          eval -= 100000;
         }
         if (pieces[i].type == 5) {
-          eval -= 900;
+          eval -= 930;
         }
         if (pieces[i].type == 4) {
-          eval -= 500;
+          eval -= 480;
         }
         if (pieces[i].type == 3) {
-          eval -= 300;
+          eval -= 320;
         }
         if (pieces[i].type == 2) {
-          eval -= 300;
+          eval -= 280;
         }
         if (pieces[i].type == 1) {
           eval -= 100;
