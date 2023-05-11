@@ -4,7 +4,6 @@
  * Random moves
  * Weight assignments for each piece in each square
  * ERROR: I can castle with my pieces there (for example, I can castle as first move)
- * ERROR: if i try to do the diagonal capture with pawn, but no pieces is there (or a piece of the pawns color is there), it wont work, but there will be no red highlight on the square afterwards
  * 
  */
 
@@ -65,7 +64,7 @@ class ChessList
     {
       for (let i=0; i<this.thePiecesArray.length; i++)
         {
-          if (!(this.thePiecesArray[i].color == color) && this.canGoTo(i, x, y))  // this.thePiecesArray[i].canGoTo - figure this out
+          if (!(this.thePiecesArray[i].color == color) && this.canGoTo(i, x, y))
           {
             return true;
           }
@@ -162,17 +161,13 @@ class ChessList
 
       this.drawCount++;
 
-
       for (let z = 0; z < this.thePiecesArray.length; z++)
       {
-
         if (this.thePiecesArray[z].x == x && this.thePiecesArray[z].y == y) {this.thePiecesArray[z].isAlive = 0; this.drawCount = 0; this.movesList = [];}
             
-        if (this.thePiecesArray[i].type == 1 && this.thePiecesArray[i].x != x && athis.thePiecesArray[z].x == x && this.thePiecesArray[i].y == this.thePiecesArray[z].y && this.thePiecesArray[z].passant == 1)
+        if (this.thePiecesArray[i].type == 1 && this.thePiecesArray[i].x != x && this.thePiecesArray[z].x == x && this.thePiecesArray[i].y == this.thePiecesArray[z].y && this.thePiecesArray[z].passant == 1)
         {this.thePiecesArray[z].isAlive = 0; this.drawCount = 0; this.movesList = [];}
       }
-
-
           
       if (this.thePiecesArray[i].type == 1) {this.drawCount = 0;}
           
@@ -182,7 +177,7 @@ class ChessList
         {
           if (this.thePiecesArray[z].type == 4 && this.thePiecesArray[z].color == this.thePiecesArray[i].color && ((this.thePiecesArray[z].x > this.thePiecesArray[i].x) == (x > this.thePiecesArray[i].x)))
           {
-            this.thePiecesArray[z].realMoveTo(x+(Math.abs(this.thePiecesArray[i].x - x) / (this.thePiecesArray[i].x - x)), this.thePiecesArray[z].y, this.thePiecesArray, 0);  // fix realMoveTo!!!!!!!!!!
+            this.realMoveTo(z, x+(Math.abs(this.thePiecesArray[i].x - x) / (this.thePiecesArray[i].x - x)), this.thePiecesArray[z].y, this.thePiecesArray);
           }
         }
       }
@@ -221,7 +216,7 @@ class ChessList
         let y = this.thePiecesArray[i].y;
         let ic = 999;
 
-        if (this.canGoTo(i, newX, newY) == true) // fix canGoTo
+        if (this.canGoTo(i, newX, newY) == true)
         {
           for (let j = 0; j < this.thePiecesArray.length; j++)
           {
@@ -230,15 +225,15 @@ class ChessList
             if (this.thePiecesArray[i].type == 1 && this.thePiecesArray[i].x != newX && this.thePiecesArray[j].x == newX && this.thePiecesArray[j].y == this.thePiecesArray[i].y && this.thePiecesArray[j].passant == 1 && this.thePiecesArray[j].isAlive == 1)
             {this.thePiecesArray[j].isAlive = 0; ic = j;}
           }  
-          this.moveTo(i, newX, newY);  // fix moveTo
+          this.moveTo(i, newX, newY);
           
           if (this.inCheck(this.thePiecesArray[i].color))
           {
-            this.moveTo(i, x, y);  // fix moveTo
+            this.moveTo(i, x, y);
             if (ic < 500) {this.thePiecesArray[ic].isAlive = 1;}
             return false;
           }
-          this.moveTo(i, x, y);  // fix moveTo
+          this.moveTo(i, x, y);
           if (ic < 500) {this.thePiecesArray[ic].isAlive = 1;}
           return true;
         }
@@ -251,6 +246,7 @@ class ChessList
     
     canGoTo(i, newX, newY)   // the big transition function
     { 
+      
         if (newX > 8 || newX < 1 || newY > 8 || newY < 1 || this.thePiecesArray[i].isAlive == 0) {return false;}
 
         if (this.thePiecesArray[i].type == 1) // pawn
@@ -259,7 +255,7 @@ class ChessList
             {
                 if (newX == this.thePiecesArray[i].x && newY == this.thePiecesArray[i].y+1)
                 {
-                    return !this.pieceThere(newX, newY, 1) && !this.pieceThere(newX, newY, 2);  // fix pieceThere and anyPieceGoTo (ALL OF THEM)
+                    return !this.pieceThere(newX, newY, 1) && !this.pieceThere(newX, newY, 2);
                 }
 
                 if (this.thePiecesArray[i].y == 2 && newY == this.thePiecesArray[i].y+2 && newX == this.thePiecesArray[i].x)
@@ -271,12 +267,13 @@ class ChessList
 
                 if (Math.abs(newX - this.thePiecesArray[i].x) == 1 && newY - this.thePiecesArray[i].y == 1)
                 {
-                  
+
                   if (!this.pieceThere(newX, newY, 2))
                   {
-                    for (let i = 0; i < a.length; i++)
+                    
+                    for (let j = 0; j < this.thePiecesArray.length; j++)
                     {
-                      if (a[i].color == 2 && a[i].passant == 1 && a[i].x == newX && a[i].y == this.y) {return true;}
+                      if (this.thePiecesArray[j].color == 2 && this.thePiecesArray[j].passant == 1 && this.thePiecesArray[j].x == newX && this.thePiecesArray[j].y == this.thePiecesArray[i].y) {return true;}
                     }
                     return false;
                   }
@@ -304,10 +301,11 @@ class ChessList
                   
                   if (!this.pieceThere(newX, newY, 1))
                   {
-                    for (let j = 0; j < a.length; j++)
+                    for (let j = 0; j < this.thePiecesArray.length; j++)
                     {
-                      if (a[j].color == 1 && a[j].passant == 1 && a[j].x == newX && a[j].y == this.thePiecesArray[i].y) {return true;}
+                      if (this.thePiecesArray[j].color == 1 && this.thePiecesArray[j].passant == 1 && this.thePiecesArray[j].x == newX && this.thePiecesArray[j].y == this.thePiecesArray[i].y) {return true;}
                     }
+                    
                     return false;
                   }  
                   
@@ -413,24 +411,26 @@ class ChessList
         if (this.thePiecesArray[i].type == 6) // king
         {
           
+
+          
           if (newY == this.thePiecesArray[i].y && Math.abs(newX - this.thePiecesArray[i].x) == 2)
           {
-            if (this.thePiecesArray[i].color == 2 && newX > this.thePiecesArray[i].x)
+            if (this.thePiecesArray[i].color == 2 && newX > this.thePiecesArray[i].x && !this.pieceThere(6, 8, 1) && !this.pieceThere(6, 8, 2) && !this.pieceThere(7, 8, 1) && !this.pieceThere(7, 8, 2))
             {
               return this.whiteCastleRight==1 && !this.anyPieceGoTo(5, 8, this.thePiecesArray[i].color) && !this.anyPieceGoTo(6, 8, this.thePiecesArray[i].color) && !this.anyPieceGoTo(7, 8, this.thePiecesArray[i].color);
             }
             
-            if (this.thePiecesArray[i].color == 2 && newX < this.thePiecesArray[i].x)
+            if (this.thePiecesArray[i].color == 2 && newX < this.thePiecesArray[i].x && !this.pieceThere(4, 8, 1) && !this.pieceThere(4, 8, 2) && !this.pieceThere(3, 8, 1) && !this.pieceThere(3, 8, 2) && !this.pieceThere(2, 8, 1) && !this.pieceThere(2, 8, 2))
             {
               return this.whiteCastleLeft==1 && !this.anyPieceGoTo(5, 8, this.thePiecesArray[i].color) && !this.anyPieceGoTo(4, 8, this.thePiecesArray[i].color) && !this.anyPieceGoTo(3, 8, this.thePiecesArray[i].color);
             }
             
-            if (this.thePiecesArray[i].color == 1 && newX > this.thePiecesArray[i].x)
+            if (this.thePiecesArray[i].color == 1 && newX > this.thePiecesArray[i].x && !this.pieceThere(6, 1, 1) && !this.pieceThere(6, 1, 2) && !this.pieceThere(7, 1, 1) && !this.pieceThere(7, 1, 2))
             {
               return this.blackCastleRight==1 && !this.anyPieceGoTo(5, 1, this.thePiecesArray[i].color) && !this.anyPieceGoTo(6, 1, this.thePiecesArray[i].color) && !this.anyPieceGoTo(7, 1, this.thePiecesArray[i].color);
             }
             
-            if (this.thePiecesArray[i].color == 1 && newX < this.thePiecesArray[i].x)
+            if (this.thePiecesArray[i].color == 1 && newX < this.thePiecesArray[i].x && !this.pieceThere(4, 1, 1) && !this.pieceThere(4, 1, 2) && !this.pieceThere(3, 1, 1) && !this.pieceThere(3, 1, 2) && !this.pieceThere(2, 1, 1) && !this.pieceThere(2, 1, 2))
             {
               return this.blackCastleRight==1 && !this.anyPieceGoTo(5, 1, this.thePiecesArray[i].color) && !this.anyPieceGoTo(4, 1, this.thePiecesArray[i].color) && !this.anyPieceGoTo(3, 1, this.thePiecesArray[i].color);
             }
@@ -496,7 +496,7 @@ document.getElementById("board").style.visibility="visible";
 
 mainList.movesList[0] = [];
 
-let game = setInterval(myFunction, 1, mainList);  // uncomment this line to start it
+let game = setInterval(myFunction, 1, mainList);
 
 let c = 0;
 
@@ -699,7 +699,7 @@ function tryToMove(i, mainList)
 
         if (mainList.canMoveTo(i, x, y) && mainList.thePiecesArray[i].color == mainList.turn && (mainList.mode == mainList.turn || mainList.mode == 3 || mainList.mode != 3)) // get this figured out (the mainList.mode == 3 thing)
         {
-
+          
           mainList.realMoveTo(i, x, y);
           
           let counter = 1;
@@ -712,12 +712,13 @@ function tryToMove(i, mainList)
             if (prom == "queen") {counter = 0; mainList.promotePawn(i, 5);}
           }
           
-          editMove(mainList);   // UNCOMMENT THIS OUT WHEN FIXED
+          editMove(mainList);
          
           mainList.pause = 1;
 
-          //computerMove(mainList);    // UNCOMMENT THIS OUT WHEN FIXED
+          // if () {computerMove(mainList);}    // UNCOMMENT THIS OUT WHEN FIXED
 
+          drawBoard(mainList);
 
           setTimeout(function() {if (mainList.game == 1) {mainList.pause = 0;} drawBoard(mainList);}, 100);
         } else
@@ -766,12 +767,12 @@ function computerMove(piecesList)
       for (let y = 1; y < 9; y++)
       {
 
-        if (piecesList.thePiecesArray[i].canMoveTo(x, y, thePieces) && piecesList.thePiecesArray[i].color == piecesList.turn) // HERE!!!!
+        if (piecesList.thePiecesArray[i].canMoveTo(x, y, thePieces) && piecesList.thePiecesArray[i].color == piecesList.turn) // HERE!!!
         {
          
           moves[moves.length] = [i, x, y]
           let copy = [...piecesList];
-          copy[i].realMoveTo(x, y, copy, 1);  // HERE!!!!!
+          copy[i].realMoveTo(x, y, copy, 1);  // HERE!!!
         }
 
       }
@@ -946,7 +947,8 @@ function drawBoard(piecesList)
 
     if (ChessList.boardFlips == 1)
     {
-      if (piecesList.turn == 1 || piecesList.pause == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
+      if (piecesList.turn == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
+      if (piecesList.pause == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
     }
     
     xPosit *= 60;
@@ -969,7 +971,8 @@ function drawBoard(piecesList)
     
     if (ChessList.boardFlips == 1)
     {
-      if (piecesList.turn == 1 || piecesList.pause == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
+      if (piecesList.turn == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
+      if (piecesList.pause == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
     }
 
     xPosit *= 60;
@@ -1013,7 +1016,8 @@ function drawBoard(piecesList)
 
     if (ChessList.boardFlips == 1)
     {
-      if (piecesList.turn == 1 || piecesList.pause == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
+      if (piecesList.turn == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
+      if (piecesList.pause == 1) {xPosit = 7-xPosit; yPosit = 7-yPosit;}
     }
 
     xPosit *= 60;
