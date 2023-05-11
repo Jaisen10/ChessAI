@@ -3,6 +3,12 @@
  * Configure it to computer moves / human moves (no flip screen)
  * Random moves
  * Weight assignments for each piece in each square
+ * Handle pawn promotion like any other move, so it gets full eval coverage (dont just always promote to queen)
+ * Opening book?
+ * double pawns less eval?
+ * incremental evaluation (evaluate fully once, then just add/subtract further things)
+ * Quiescence Search (just for captures, etc.)
+ * futility pruning (stop calculating if it gets super bad)
  *
  */
 
@@ -1068,7 +1074,12 @@ function tryToMove(i, mainList) {
 
 function computerMove(mainList) {
   let moves = [];
-  let points = -1000;
+  let points = 0;
+  if (mainList.turn == 1) {
+    points = Number.NEGATIVE_INFINITY;
+  } else {
+    points = Number.POSITIVE_INFINITY;
+  }
 
   for (let i = 0; i < mainList.thePiecesArray.length; i++) {
     for (let x = 1; x < 9; x++) {
@@ -1081,7 +1092,10 @@ function computerMove(mainList) {
 
           copy.realMoveTo(i, x, y);
 
-          if (evaluation(copy) > points) {
+          if (
+            (mainList.turn == 1 && evaluation(copy) > points) ||
+            (mainList.turn == 2 && evaluation(copy) < points)
+          ) {
             points = evaluation(copy);
             moves = [];
             moves[0] = [i, x, y];
@@ -1123,9 +1137,10 @@ function computerMove(mainList) {
     }
     drawBoard(mainList);
     if (ChessList.mode == 4 && mainList.game == 1) {
+      // should be mode == 4, but this is a test version
       computerMove(mainList);
     }
-  }, 1);
+  }, 10);
 }
 
 function deepCopy(obj) {
@@ -1159,6 +1174,7 @@ function deepCopy(obj) {
 }
 
 function evaluation(chessSetup) {
+  // give some weightage for inCheck and infinite weightage for inCheckMate. if winning by evaluation then lose points for stalemate, but if losing by evaluation, then give points for stalemate. also give bishop 330 and knight 310
   let eval = 0;
   const pieces = chessSetup.thePiecesArray;
   for (let i = 0; i < pieces.length; i++) {
