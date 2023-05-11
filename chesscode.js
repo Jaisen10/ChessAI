@@ -1035,7 +1035,7 @@ function tryToMove(i, mainList) {
             ) {
               computerMove(mainList);
             }
-          }, 1000);
+          }, 100);
         } else {
           if (
             (x != mainList.thePiecesArray[i].x ||
@@ -1079,8 +1079,10 @@ function computerMove(mainList) {
           mainList.thePiecesArray[i].color == mainList.turn
         ) {
           moves[moves.length] = [i, x, y];
-          //let copy = [...mainList];
-          //copy.realMoveTo(i, x, y);  // HERE!!!
+
+          const copy = deepCopy(mainList);
+
+          copy.realMoveTo(i, x, y);
         }
       }
     }
@@ -1118,6 +1120,36 @@ function computerMove(mainList) {
       computerMove(mainList);
     }
   }, 1);
+}
+
+function deepCopy(obj) {
+  const copy = new ChessList();
+
+  copy.turn = obj.turn;
+  copy.whiteCastleRight = obj.whiteCastleRight;
+  copy.whiteCastleLeft = obj.whiteCastleLeft;
+  copy.blackCastleRight = obj.blackCastleRight;
+  copy.blackCastleLeft = obj.blackCastleLeft;
+  copy.highlight = obj.highlight;
+  copy.highlight2 = obj.highlight2;
+  copy.red = obj.red;
+  copy.redCount = obj.redCount;
+  copy.game = obj.game;
+  copy.drawCount = obj.drawCount;
+
+  copy.movesList[0] = [...obj.movesList[0]]; // MAKE SURE THIS IS OKAY, WITH JUST THE FIRST AS AN ARRAY
+
+  for (let i = 1; i < obj.movesList.length; i++) {
+    copy.movesList[i] = obj.movesList[i];
+  }
+
+  copy.pause = obj.pause;
+
+  for (let i = 0; i < obj.thePiecesArray.length; i++) {
+    copy.thePiecesArray[i] = { ...obj.thePiecesArray[i] };
+  }
+
+  return copy;
 }
 
 function evaluation(pieces) {
