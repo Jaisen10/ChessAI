@@ -1066,10 +1066,9 @@ function tryToMove(i, mainList) {
   }
 }
 
-// HERE!!!
-
 function computerMove(mainList) {
   let moves = [];
+  let points = -1000;
 
   for (let i = 0; i < mainList.thePiecesArray.length; i++) {
     for (let x = 1; x < 9; x++) {
@@ -1078,11 +1077,18 @@ function computerMove(mainList) {
           mainList.canMoveTo(i, x, y) &&
           mainList.thePiecesArray[i].color == mainList.turn
         ) {
-          moves[moves.length] = [i, x, y];
-
           const copy = deepCopy(mainList);
 
           copy.realMoveTo(i, x, y);
+
+          if (evaluation(copy) > points) {
+            points = evaluation(copy);
+            moves = [];
+            moves[0] = [i, x, y];
+          }
+          if (evaluation(copy) == points) {
+            moves[moves.length] = [i, x, y];
+          }
         }
       }
     }
@@ -1152,46 +1158,49 @@ function deepCopy(obj) {
   return copy;
 }
 
-function evaluation(pieces) {
+function evaluation(chessSetup) {
   let eval = 0;
-  for (let i = 0; i < pieces; i++) {
-    if (pieces[i].color == 1) {
-      if (pieces[i].type == 6) {
-        eval += 10000;
-      }
-      if (pieces[i].type == 5) {
-        eval += 900;
-      }
-      if (pieces[i].type == 4) {
-        eval += 500;
-      }
-      if (pieces[i].type == 3) {
-        eval += 300;
-      }
-      if (pieces[i].type == 2) {
-        eval += 300;
-      }
-      if (pieces[i].type == 1) {
-        eval += 100;
-      }
-    } else {
-      if (pieces[i].type == 6) {
-        eval -= 10000;
-      }
-      if (pieces[i].type == 5) {
-        eval -= 900;
-      }
-      if (pieces[i].type == 4) {
-        eval -= 500;
-      }
-      if (pieces[i].type == 3) {
-        eval -= 300;
-      }
-      if (pieces[i].type == 2) {
-        eval -= 300;
-      }
-      if (pieces[i].type == 1) {
-        eval -= 100;
+  const pieces = chessSetup.thePiecesArray;
+  for (let i = 0; i < pieces.length; i++) {
+    if (pieces[i].isAlive == 1) {
+      if (pieces[i].color == 1) {
+        if (pieces[i].type == 6) {
+          eval += 10000;
+        }
+        if (pieces[i].type == 5) {
+          eval += 900;
+        }
+        if (pieces[i].type == 4) {
+          eval += 500;
+        }
+        if (pieces[i].type == 3) {
+          eval += 300;
+        }
+        if (pieces[i].type == 2) {
+          eval += 300;
+        }
+        if (pieces[i].type == 1) {
+          eval += 100;
+        }
+      } else {
+        if (pieces[i].type == 6) {
+          eval -= 10000;
+        }
+        if (pieces[i].type == 5) {
+          eval -= 900;
+        }
+        if (pieces[i].type == 4) {
+          eval -= 500;
+        }
+        if (pieces[i].type == 3) {
+          eval -= 300;
+        }
+        if (pieces[i].type == 2) {
+          eval -= 300;
+        }
+        if (pieces[i].type == 1) {
+          eval -= 100;
+        }
       }
     }
   }
